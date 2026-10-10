@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "bash /Users/kamal/Desktop/solana/cwf/docs/design/cwf-ui-gate.sh . .",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name pledge --branch main"
   },
   "dependencies": {
     "@nktkas/hyperliquid": "*",
