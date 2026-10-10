@@ -1,0 +1,8 @@
+@import "tailwindcss";
+/* shadcn tokens mapped to DESIGN.md (PLEDGE term sheet v3). */
+@theme inline {
+  --color-background: #FAF8F3; --color-foreground: #1A1D21; --color-primary: #1F3A5F; --color-primary-foreground: #FAF8F3;
+  --color-secondary: #EFEBE2; --color-secondary-foreground: #1A1D21; --color-muted: #EFEBE2; --color-muted-foreground: #5B6470;
+  --color-accent: #EFEBE2; --color-accent-foreground: #1A1D21; --color-destructive: #8A2E1F; --color-border: #DDD7CA; --color-input: #1A1D21; --color-ring: #1F3A5F;
+  --color-popover: #FAF8F3; --color-popover-foreground: #1A1D21; --color-amber: #B7791F; --radius: 2px;
+}

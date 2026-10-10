@@ -1,0 +1,101 @@
+{
+ "url": "https://app.sablier.com/vesting/",
+ "viewport": [
+  390,
+  844
+ ],
+ "title": "Vesting | Sablier",
+ "h1": {
+  "text": "Vesting",
+  "font": "Urbanist",
+  "size": "30px",
+  "weight": "600",
+  "tracking": "normal",
+  "leading": "37.5px",
+  "color": "rgb(255, 255, 255)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px solid rgb(255, 255, 255)",
+  "transform": "none"
+ },
+ "h2": null,
+ "h3": {
+  "text": "Connect to view your streams",
+  "font": "Urbanist",
+  "size": "20px",
+  "weight": "600",
+  "tracking": "normal",
+  "leading": "28px",
+  "color": "rgb(245, 246, 251)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px solid rgb(245, 246, 251)",
+  "transform": "none"
+ },
+ "body": {
+  "text": "About error reporting\n\nWe use Sentry to report errors and im",
+  "font": "Urbanist",
+  "size": "16px",
+  "weight": "400",
+  "tracking": "normal",
+  "leading": "16px",
+  "color": "rgb(225, 228, 234)",
+  "bg": "rgb(26, 29, 40)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px solid rgb(225, 228, 234)",
+  "transform": "none"
+ },
+ "p": {
+  "text": "About error reporting",
+  "font": "Urbanist",
+  "size": "14px",
+  "weight": "600",
+  "tracking": "normal",
+  "leading": "20px",
+  "color": "rgb(255, 255, 255)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px solid rgb(255, 255, 255)",
+  "transform": "none"
+ },
+ "a": {
+  "text": "Privacy Policy",
+  "font": "Urbanist",
+  "size": "12px",
+  "weight": "500",
+  "tracking": "normal",
+  "leading": "12px",
+  "color": "rgb(245, 246, 251)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px solid rgb(245, 246, 251)",
+  "transform": "none"
+ },
+ "button": {
+  "text": "Manage",
+  "font": "Urbanist",
+  "size": "14px",
+  "weight": "600",
+  "tracking": "normal",
+  "leading": "20px",
+  "color": "rgb(225, 228, 234)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "4px",
+  "padding": "8px 16px",
+  "border": "2px solid rgb(42, 46, 65)",
+  "transform": "none"
+ },
+ "input": null,
+ "loadedFonts": [
+  "Urbanist"
+ ],
+ "htmlBg": "rgba(0, 0, 0, 0)",
+ "bodyText": "About error reporting\n\nWe use Sentry to report errors and improve stability. You can customize your preferences at any time. Read our Privacy Policy.\n\nManage\nAccept all\n\nHome\n\nVesting\n\nAll\n\nVesting\nCreate\nConnect to view your streams\n\nConnect your wallet to see your vesting streams, track progress, and manage withdrawals.\n\nConnect Wallet\nSearch\nBuy ETH on Transak\nStart Vesting\n\nLooking to set up a",
+ "textLen": 579,
+ "height": 1320
+}

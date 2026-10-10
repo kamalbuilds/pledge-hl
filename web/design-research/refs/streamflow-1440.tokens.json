@@ -1,0 +1,102 @@
+{
+ "url": "https://streamflow.finance/",
+ "viewport": [
+  1440,
+  900
+ ],
+ "title": "Solana Token Distribution Platform | Vesting | Airdrops | Streamflow",
+ "h1": {
+  "text": "Solana Token Distribution Platform - Streamflow",
+  "font": "Inter, \"Inter Placeholder\", sans-serif",
+  "size": "56px",
+  "weight": "500",
+  "tracking": "-1.12px",
+  "leading": "64px",
+  "color": "rgb(185, 238, 255)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px none rgb(185, 238, 255)",
+  "transform": "none"
+ },
+ "h2": {
+  "text": "Get a custom solution for your token distribution platform",
+  "font": "Inter, \"Inter Placeholder\", sans-serif",
+  "size": "48px",
+  "weight": "500",
+  "tracking": "-0.96px",
+  "leading": "56px",
+  "color": "rgb(255, 255, 255)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px none rgb(255, 255, 255)",
+  "transform": "none"
+ },
+ "h3": {
+  "text": "What our users say",
+  "font": "Inter, \"Inter Placeholder\", sans-serif",
+  "size": "40px",
+  "weight": "500",
+  "tracking": "-0.8px",
+  "leading": "48px",
+  "color": "rgb(255, 255, 255)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px none rgb(255, 255, 255)",
+  "transform": "none"
+ },
+ "body": {
+  "text": "Solutions\n\nVesting\nAirdrops\nStaking\nToken Locks\nToken Mint\nT",
+  "font": "sans-serif",
+  "size": "12px",
+  "weight": "400",
+  "tracking": "normal",
+  "leading": "normal",
+  "color": "rgb(0, 0, 0)",
+  "bg": "rgb(4, 5, 8)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px none rgb(0, 0, 0)",
+  "transform": "none"
+ },
+ "p": {
+  "text": "Solutions",
+  "font": "sans-serif",
+  "size": "12px",
+  "weight": "400",
+  "tracking": "normal",
+  "leading": "normal",
+  "color": "rgb(0, 0, 0)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px none rgb(0, 0, 0)",
+  "transform": "none"
+ },
+ "a": {
+  "text": "Vesting",
+  "font": "sans-serif",
+  "size": "12px",
+  "weight": "400",
+  "tracking": "normal",
+  "leading": "normal",
+  "color": "rgb(0, 0, 238)",
+  "bg": "rgba(0, 0, 0, 0)",
+  "radius": "0px",
+  "padding": "0px",
+  "border": "0px none rgb(0, 0, 238)",
+  "transform": "none"
+ },
+ "button": null,
+ "input": null,
+ "loadedFonts": [
+  "Inter",
+  "Inter Placeholder"
+ ],
+ "htmlBg": "rgba(0, 0, 0, 0)",
+ "bodyText": "Solutions\n\nVesting\nAirdrops\nStaking\nToken Locks\nToken Mint\nToken Dashboard\n\nUse cases\n\nGaming\nDeFi\nNFT\n\nCompany\n\nSolana\nIntegrations\nAbout\nCareers\nContact\n\nResources\n\nCase Studies\nBlog\nPodcasts\nTutorials\nFAQs\nFees\n\nStake STREAM\n\nOpen app\n\nNew\n\n70% of STREAM Supply Burned\n\nSolana Token Distribution Platform - Streamflow\n\nToken distribution on Solana shouldn’t rely on spreadsheets and one-off transf",
+ "textLen": 13750,
+ "height": 12439
+}
