@@ -1,0 +1,9 @@
+{"t":1791608119600,"step":"perp->spot 100 USDC","r":{"status":"ok","response":{"type":"default"}}}
+{"t":1791608119605,"step":"new BACKED operator","address":"0x263F74859F6c932Db0B4F11165580AE58984D8cc"}
+{"t":1791608120484,"step":"spotSend 50 USDC to BACKED op","r":{"status":"ok","response":{"type":"default"}}}
+{"t":1791608144369,"step":"buy 1.1 HYPE IOC","mid":25.956,"px":"26.73","r":{"err":"order 0: Order could not immediately match against any resting orders. asset=11035"}}
+{"t":1791608162571,"step":"buy 1.1 HYPE IOC","mid":25.956,"px":"29.5","r":{"status":"ok","response":{"type":"order","data":{"statuses":[{"filled":{"totalSz":"1.1","avgPx":"29.4","oid":62316131688}}]}}}}
+{"t":1791608297050,"step":"bid cancel","r":"none"}
+{"t":1791608309419,"step":"bid place","px":"29.0","sz":"0.35","r":{"status":"ok","response":{"type":"order","data":{"statuses":[{"resting":{"oid":62316263393}}]}}}}
+{"t":1791608322113,"step":"bid cancel","r":"none"}
+{"t":1791608377637,"step":"operator sell 0.45 HYPE IOC","r":{"status":"ok","response":{"type":"order","data":{"statuses":[{"filled":{"totalSz":"0.45","avgPx":"22.512","oid":62316323669}}]}}}}

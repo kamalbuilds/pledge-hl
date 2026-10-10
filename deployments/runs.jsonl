@@ -1,1 +1,14 @@
 {"t":1791607789331,"v":2,"real":true,"step":"preflight","pledge":"0x1cf99b8af3745deef01cc1c29708e10d4538e50e","SZ":0.5,"limitPx":22.061,"notional":11.0305,"opCoreHype":0.009,"opEvmHype":0.44657134266384807,"pledgeCoreHype":0,"remainingToday":0.5,"problems":["short 0.491 HYPE (need it on Core or EVM + ~0.02 gas)"]}
+{"t":1791608173433,"v":2,"real":true,"step":"preflight","pledge":"0x1cf99b8af3745deef01cc1c29708e10d4538e50e","SZ":0.5,"limitPx":28.812,"notional":14.406,"opCoreHype":1.10823,"opEvmHype":0.44657134266384807,"pledgeCoreHype":0,"remainingToday":0.5,"problems":[]}
+{"t":1791608175099,"v":2,"real":true,"step":"spotSend to pledge","resp":{"status":"ok","response":{"type":"default"}}}
+{"t":1791608177457,"v":2,"real":true,"step":"sell","tx":"0xe3faafd9f9d0ec9777282ae74649df56fd3776961a0e78f317c6c8f6a269c236","status":"success","block":"66503101","balBefore":"50000000"}
+{"t":1791608201037,"v":2,"real":true,"step":"core balance moved","balAfter":"50000000","ms":25605}
+{"t":1791608223179,"v":2,"real":true,"step":"reconcile","tx":"0x896adaa03f89765902691a23b94e7fdd8011a03238dbc2c3862d60b507fd8a49","status":"success","events":[{"name":"Filled","args":{"filled8":"0","refunded8":"50000000","soldToday":"0"}}],"soldToday":"0"}
+{"t":1791608223395,"v":2,"real":true,"step":"core fills","fills":[]}
+{"t":1791608313171,"v":2,"real":true,"step":"preflight","pledge":"0x1cf99b8af3745deef01cc1c29708e10d4538e50e","SZ":0.5,"limitPx":28.812,"notional":14.406,"opCoreHype":0.60823,"opEvmHype":0.4465565124638481,"pledgeCoreHype":0.5,"remainingToday":0.5,"problems":[]}
+{"t":1791608315575,"v":2,"real":true,"step":"sell","tx":"0xcf296da82fa71b4fe872c7465e758b4af35d09cecc1e568b06cc4ecc6bab4a49","status":"success","block":"66503241","balBefore":"50000000"}
+{"t":1791608421122,"v":2,"real":true,"step":"preflight","pledge":"0x1cf99b8af3745deef01cc1c29708e10d4538e50e","SZ":0.5,"limitPx":22.061,"notional":11.0305,"opCoreHype":0.50809,"opEvmHype":0.44654367226380715,"pledgeCoreHype":0.5,"remainingToday":0.5,"problems":[]}
+{"t":1791608423524,"v":2,"real":true,"step":"sell","tx":"0x6d90c02488153aea9b9043bf0a33de24a3b416ac60fb55ed65702e4245c78430","status":"success","block":"66503351","balBefore":"50000000"}
+{"t":1791608424802,"v":2,"real":true,"step":"core balance moved","balAfter":"0","ms":3511}
+{"t":1791608426753,"v":2,"real":true,"step":"reconcile","tx":"0x61c9f769d31b7bf750422f1355b2ba1b3ac953ad8ca7d04ad5d650a09e675f03","status":"success","events":[{"name":"Filled","args":{"filled8":"50000000","refunded8":"0","soldToday":"50000000"}}],"soldToday":"50000000"}
+{"t":1791608426993,"v":2,"real":true,"step":"core fills","fills":[{"coin":"@1035","px":"22.512","sz":"0.5","side":"A","time":1791608423395,"startPosition":"0.5","dir":"Sell","closedPnl":"-3.444","hash":"0xf1b569a43aa6503bf32f042b56c7ea0000f08189d5a96f0e957e14f6f9aa2a26","oid":62316366977,"crossed":true,"fee":"0.0078792","tid":920672658322131,"feeToken":"USDC","twapId":null}]}

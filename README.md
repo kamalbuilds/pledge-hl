@@ -27,7 +27,8 @@ cd web && npm i && npm run dev
 | Live oracle and limit read via 0x808 (22.512 -> 22.061) | REAL testnet |
 | Rejected on-chain: 2× cap sell `0x605126b8…807f`, cancel `0x6c32d949…5c8c`, early release `0x2ff82664…d5d8` | REAL testnet |
 | Funded sale: full fill, never-fill refund, partial fill + next day, oracle crash below floor | FORK-SIMULATED (forge fork of 998, HyperCore mocked). Tenderly has no HyperEVM network |
-| A real HyperCore fill from the contract | NOT YET. Testnet funds blocked (the faucet needs a mainnet deposit, and the min order is $10 ≈ 0.5 HYPE) |
+| Real funded sale (Oct 10): 0.5 HYPE locked, sell() tx `0x6d90c024…8430` filled 0.5 @ 22.512 on HyperCore (fill hash `0xf1b569a4…2a26`); reconcile() tx `0x61c9f769…5f03` emitted Filled(0.5, refund 0), soldToday = 0.5 = cap; the next sell() reverted on-chain `0x62eb3c43…62f1`. 11.248 USDC proceeds sit in the contract | REAL testnet |
+| Real unfilled IOC refunded the cap: sells `0xe3faafd9…c236` and `0xcf296da8…4a49` got no fill (no bids above the limit); reconcile `0x896adaa0…8a49` -> Filled(0, refund 0.5) | REAL testnet |
 
 ## Built before vs during the event
 - Before the build sprint (Oct 10 spike): Pledge v1 (cap + floor, caller-set price), 5 tests, v1 testnet deploy.
