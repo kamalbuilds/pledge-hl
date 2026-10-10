@@ -1,0 +1,102 @@
+{
+ "started": "2026-10-10T18:14:33.029Z",
+ "base": "http://localhost:4317",
+ "tester": "0xBBddd45458F99FA46bE10DC31f30533DA7360Aa9",
+ "steps": [
+  {
+   "name": "wallet sent tx",
+   "at": "2026-10-10T18:15:17.326Z",
+   "tx": "0x1327f21141d54cbb8667c1c7ede7a28b494f48c602eee9e36bdb254a45fa3d57",
+   "to": "CREATE"
+  },
+  {
+   "name": "created pledge",
+   "at": "2026-10-10T18:15:17.768Z",
+   "addr": "0x9af101c5d73432510e037dc8b05ec35811de91a5",
+   "url": "http://localhost:4317/#/p/0x9af101c5d73432510e037dc8b05ec35811de91a5"
+  },
+  {
+   "name": "wallet signed typed data",
+   "at": "2026-10-10T18:15:22.735Z",
+   "primaryType": "HyperliquidTransaction:SpotSend"
+  },
+  {
+   "name": "deposit log",
+   "at": "2026-10-10T18:15:24.011Z",
+   "text": "0.5 HYPE locked on HyperCore"
+  },
+  {
+   "name": "deposit visible",
+   "at": "2026-10-10T18:15:29.248Z",
+   "available": "0.5 HYPE"
+  },
+  {
+   "name": "book",
+   "at": "2026-10-10T18:15:29.940Z",
+   "bestBid": 22.538,
+   "limitPx": 22.089,
+   "note": "existing testnet bids are above the contract limit; no operator liquidity needed"
+  },
+  {
+   "name": "operator bid (disclosed liquidity)",
+   "at": "2026-10-10T18:15:29.940Z",
+   "limitPx": 22.089,
+   "bidPx": "22.111",
+   "r": "\"skipped\""
+  },
+  {
+   "name": "wallet sent tx",
+   "at": "2026-10-10T18:15:31.358Z",
+   "tx": "0x5f9fb781be281ef3fe5acfb59c05ca45803314ba46ece30e117bb2f7fe051913",
+   "to": "0x9af101c5d73432510e037dc8b05ec35811de91a5"
+  },
+  {
+   "name": "sale log",
+   "at": "2026-10-10T18:15:31.710Z",
+   "text": "Sale submitted, tx 0x5f9f…1913"
+  },
+  {
+   "name": "fill visible in record of sales",
+   "at": "2026-10-10T18:16:01.157Z",
+   "rows": 5,
+   "first": "10/10/2026, 11:45:31 PM\tSell real\t0.5\t22.538\t0xeb07…3e11"
+  },
+  {
+   "name": "wallet sent tx",
+   "at": "2026-10-10T18:16:03.203Z",
+   "tx": "0x48b4ea63b122be32ab223c9f05b40936649ca0877f93b2e7a9549cbb59c65bd7",
+   "to": "0x9af101c5d73432510e037dc8b05ec35811de91a5"
+  },
+  {
+   "name": "reconcile",
+   "at": "2026-10-10T18:16:03.944Z",
+   "text": "Fills reconciled, tx 0x48b4…5bd7"
+  },
+  {
+   "name": "state after",
+   "at": "2026-10-10T18:16:06.766Z",
+   "avail": "0 HYPE",
+   "now": "Available to sell now\n0 HYPE\nDeposit HYPE\n\n0 HYPE locked now. 0.5 HYPE sold for 11.27 USDC. Nothing left to sell until the team deposits more."
+  },
+  {
+   "name": "rejections",
+   "at": "2026-10-10T18:16:12.101Z",
+   "verdicts": [
+    "Rejected\n\"irrevocable: no cancel\"\n11:46:07 PM",
+    "Rejected\n\"pledge active\"\n11:46:09 PM",
+    "Rejected\n\"daily cap\"\n11:46:10 PM"
+   ]
+  },
+  {
+   "name": "operator bid cancelled",
+   "at": "2026-10-10T18:16:13.308Z"
+  }
+ ],
+ "pledge": "0x9af101c5d73432510e037dc8b05ec35811de91a5",
+ "pageErrors": [],
+ "txs": [
+  "0x1327f21141d54cbb8667c1c7ede7a28b494f48c602eee9e36bdb254a45fa3d57",
+  "0x5f9fb781be281ef3fe5acfb59c05ca45803314ba46ece30e117bb2f7fe051913",
+  "0x48b4ea63b122be32ab223c9f05b40936649ca0877f93b2e7a9549cbb59c65bd7"
+ ]
+}
