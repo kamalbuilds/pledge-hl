@@ -20,8 +20,8 @@ export function revertReason(e: unknown): string {
 }
 /** eth_call against the live testnet contract: proves the rule without spending gas. */
 export async function attempt(address: Address, account: Address, functionName: string, args: any[]) {
-  try { await pub.simulateContract({ address, abi: ABI, functionName, args, account }); return { ok: true, reason: 'would succeed' }; }
-  catch (e) { return { ok: false, reason: revertReason(e) }; }
+  try { await pub.simulateContract({ address, abi: ABI, functionName, args, account }); return { ok: true, reverted: false, reason: 'would succeed' }; }
+  catch (e) { const rev = e instanceof BaseError && !!e.walk(x => x instanceof ContractFunctionRevertedError); return { ok: false, reverted: rev, reason: revertReason(e) }; }
 }
 export async function wallet() {
   const eth = (window as any).ethereum; if (!eth) throw new Error('No browser wallet found (install MetaMask / Rabby)');
