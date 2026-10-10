@@ -161,7 +161,39 @@ function Agreement({ addr }: { addr: Address }) {
         <nav className="toc" aria-label="Clauses"><p className="meta">On this agreement</p><ol>{['Tokens locked', 'Maximum sale per day', 'Sale price', 'Cannot cancel', 'Term', 'Record of sales'].map((t, i) => <li key={t}><a href={`#c${i + 1}`} onClick={e => { e.preventDefault(); document.getElementById(`c${i + 1}`)?.scrollIntoView(); }}>{i + 1}. {t}</a></li>)}</ol></nav>
       </aside>
     </div>
+    <Annexes addr={addr} />
   </main>;
+}
+
+const E2E = { pledge: '0x9af101c5d73432510e037dc8b05ec35811de91a5', create: '0x1327f21141d54cbb8667c1c7ede7a28b494f48c602eee9e36bdb254a45fa3d57', sale: '0x5f9fb781be281ef3fe5acfb59c05ca45803314ba46ece30e117bb2f7fe051913', reconcile: '0x48b4ea63b122be32ab223c9f05b40936649ca0877f93b2e7a9549cbb59c65bd7' };
+function Annexes({ addr }: { addr: Address }) {
+  const curl = `curl -s -X POST https://api.hyperliquid-testnet.xyz/info -H 'content-type: application/json' -d '{"type":"userFills","user":"${addr}"}'`;
+  return <section className="annexes">
+    <article className="annex-doc" id="judges">
+      <p className="fig1-n">Annex B</p><h2>For judges: verify it on-chain in 60 seconds</h2>
+      <ol className="steps">
+        <li><p><b>The contract exists and holds the terms.</b> Open <a href={`${EXPLORER}/address/${addr}`} target="_blank" rel="noreferrer" className="fig">{short(addr)}</a> on the HyperEVM testnet explorer. The source is in the repo at <span className="fig">contracts/src/Pledge.sol</span>; it has no owner, no admin and no withdraw before the end date.</p></li>
+        <li><p><b>It cannot be cancelled.</b> Press the three "Simulate" buttons in clause 4. Each one asks the live contract and comes back Rejected. The same calls were also sent as real transactions, and they reverted; the links are next to each check.</p></li>
+        <li><p><b>The sale really filled on HyperCore.</b> Run this and look for side "A" (sell) fills:</p><pre className="code fig">{curl}</pre></li>
+        <li><p><b>The full flow works from a wallet.</b> Our click-through test drafted a new agreement, deposited 0.5 HYPE, triggered a sale and reconciled it, from a browser wallet on testnet: agreement <a href={`${EXPLORER}/address/${E2E.pledge}`} target="_blank" rel="noreferrer" className="fig">{short(E2E.pledge)}</a>, create <a href={`${EXPLORER}/tx/${E2E.create}`} target="_blank" rel="noreferrer" className="fig">{short(E2E.create)}</a>, sale <a href={`${EXPLORER}/tx/${E2E.sale}`} target="_blank" rel="noreferrer" className="fig">{short(E2E.sale)}</a>, reconcile <a href={`${EXPLORER}/tx/${E2E.reconcile}`} target="_blank" rel="noreferrer" className="fig">{short(E2E.reconcile)}</a>. The fill was 0.5 HYPE at 22.538 against bids already on the testnet book.</p></li>
+      </ol>
+      <Table className="terms rv"><TableHeader><TableRow><TableHead>Claim</TableHead><TableHead>Real or simulated</TableHead></TableRow></TableHeader><TableBody>
+        <TableRow><TableCell>Contract deployed, terms fixed, cancel and early withdraw revert</TableCell><TableCell><Badge variant="outline">real, testnet</Badge></TableCell></TableRow>
+        <TableRow><TableCell>Deposit of HYPE from HyperCore into the contract</TableCell><TableCell><Badge variant="outline">real, testnet</Badge></TableCell></TableRow>
+        <TableRow><TableCell>Sale as an IOC order on the HyperCore HYPE/USDC book, filled size counted against the daily cap</TableCell><TableCell><Badge variant="outline">real, testnet</Badge></TableCell></TableRow>
+        <TableRow><TableCell>Unfilled orders return their size to the day's allowance</TableCell><TableCell><Badge variant="outline">real, testnet</Badge> (an earlier IOC was cancelled and refunded)</TableCell></TableRow>
+        <TableRow><TableCell>Multi-day schedules, floor halts and end-of-term withdrawal</TableCell><TableCell><Badge variant="outline">fork-simulated</Badge> see Annex A</TableCell></TableRow>
+        <TableRow><TableCell>Mainnet, real token teams, the protocol fee below</TableCell><TableCell><Badge variant="outline">not built yet</Badge></TableCell></TableRow>
+      </TableBody></Table>
+    </article>
+    <article className="annex-doc" id="business">
+      <p className="fig1-n">Annex C</p><h2>Business model</h2>
+      <p><b>Who pays:</b> the token team or foundation that locks supply. They get a public, checkable promise not to dump, which they can show to exchanges, market makers and holders. Buyers and keepers pay nothing.</p>
+      <p><b>Fee (proposed, not in the testnet contract):</b> 0.25% of filled sale proceeds, taken in USDC as each sale fills. A team only pays when the plan is working. For comparison, Streamflow charges 0.16 SOL plus 0.19% to create a vesting contract and 0.5% for a token lock, and Sablier's interface charges $0.99 per stream withdrawal.</p>
+      <p><b>Market:</b> Tokenomist counts <span className="fig">$97.43B</span> of tokens unlocked in 2025, of which <span className="fig">$18.77B</span> went to insiders (team and investors), the supply holders worry about most. HYPE itself unlocked about <span className="fig">$496M</span> in 2025. Illustration only: if 1% of insider unlocks were sold through PLEDGE at 0.25%, that is about <span className="fig">$470K</span> a year in fees.</p>
+      <p className="meta">Sources: <a href="https://www.tokenomist.ai/research/2025-token-unlocks-review-a-complete-breakdown-of-emissions-insider-vesting-and-market-impact" target="_blank" rel="noreferrer">Tokenomist 2025 Token Unlocks Review</a>; <a href="https://streamflow.finance/blog/how-much-does-streamflow-cost" target="_blank" rel="noreferrer">Streamflow pricing</a>; <a href="https://docs.sablier.com/concepts/fees" target="_blank" rel="noreferrer">Sablier fees</a>.</p>
+    </article>
+  </section>;
 }
 
 function Create() {
