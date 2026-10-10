@@ -7,3 +7,12 @@
 {"t":1791608309419,"step":"bid place","px":"29.0","sz":"0.35","r":{"status":"ok","response":{"type":"order","data":{"statuses":[{"resting":{"oid":62316263393}}]}}}}
 {"t":1791608322113,"step":"bid cancel","r":"none"}
 {"t":1791608377637,"step":"operator sell 0.45 HYPE IOC","r":{"status":"ok","response":{"type":"order","data":{"statuses":[{"filled":{"totalSz":"0.45","avgPx":"22.512","oid":62316323669}}]}}}}
+{"t":1791655774651,"step":"tester address","address":"0xBBddd45458F99FA46bE10DC31f30533DA7360Aa9"}
+{"t":1791655775790,"step":"spotSend 2 USDC to tester","r":{"status":"ok","response":{"type":"default"}}}
+{"t":1791655776646,"step":"spotSend 0.3 HYPE to tester","r":{"status":"ok","response":{"type":"default"}}}
+{"t":1791655819930,"step":"tester address","address":"0xBBddd45458F99FA46bE10DC31f30533DA7360Aa9"}
+{"t":1791655822928,"step":"EVM 0.12 HYPE gas to tester","tx":"0x2673ebb280101989eb47bda7f770f31578a18968cd6cfc9afa5ccf9a6e9d6d52","status":"success"}
+{"t":1791656028729,"step":"before","op":{"USDC":"14.10713567","PURR":"2.9664","HYPE":"0.20809","+102180":"16.0","+102181":"0.0"},"tester":{"USDC":"1.0","HYPE":"0.05"}}
+{"t":1791656029892,"step":"op buy 0.45 HYPE IOC","ask":22.54,"px":"23.216","r":"[{\"filled\":{\"totalSz\":\"0.45\",\"avgPx\":\"22.54\",\"oid\":62360533168}}]"}
+{"t":1791656030814,"step":"spotSend 0.5 HYPE to tester","r":{"status":"ok","response":{"type":"default"}}}
+{"t":1791656031211,"step":"after","op":{"USDC":"3.96413567","PURR":"2.9664","HYPE":"0.157775","+102180":"16.0","+102181":"0.0"},"tester":{"USDC":"1.0","HYPE":"0.55"}}

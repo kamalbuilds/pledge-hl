@@ -1,0 +1,4 @@
+import fs from 'node:fs'; import * as hl from '@nktkas/hyperliquid'; import { privateKeyToAccount } from 'viem/accounts'; import { createPublicClient, http, formatEther } from 'viem';
+const K = '/Users/kamal/Desktop/solana/cwf/hyperliquid/.keys/'; const addrs = process.argv.slice(2).length ? process.argv.slice(2) : [privateKeyToAccount(JSON.parse(fs.readFileSync(K + 'demo-operator.json', 'utf8'))[0].private_key).address];
+const info = new hl.InfoClient({ transport: new hl.HttpTransport({ isTestnet: true }) }); const pub = createPublicClient({ transport: http('https://rpc.hyperliquid-testnet.xyz/evm') });
+for (const a of addrs) console.log(a, JSON.stringify((await info.spotClearinghouseState({ user: a })).balances.map(b => [b.coin, b.total])), 'evm', formatEther(await pub.getBalance({ address: a })));

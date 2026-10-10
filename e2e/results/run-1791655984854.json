@@ -1,0 +1,44 @@
+{
+ "started": "2026-10-10T18:12:05.820Z",
+ "base": "http://localhost:4317",
+ "tester": "0xBBddd45458F99FA46bE10DC31f30533DA7360Aa9",
+ "steps": [
+  {
+   "name": "wallet sent tx",
+   "at": "2026-10-10T18:12:11.091Z",
+   "tx": "0xec1d7f18547a7e07fba5916444fcbcf578e546e76982280aeddb06717e47b888",
+   "to": "CREATE"
+  },
+  {
+   "name": "created pledge",
+   "at": "2026-10-10T18:12:11.504Z",
+   "addr": "0x13c156409c57076550077313970ec125bca59f80",
+   "url": "http://localhost:4317/#/p/0x13c156409c57076550077313970ec125bca59f80"
+  },
+  {
+   "name": "wallet signed typed data",
+   "at": "2026-10-10T18:12:16.514Z",
+   "primaryType": "HyperliquidTransaction:SpotSend"
+  },
+  {
+   "name": "deposit log",
+   "at": "2026-10-10T18:12:17.779Z",
+   "text": "0.25 HYPE locked on HyperCore"
+  },
+  {
+   "name": "deposit visible",
+   "at": "2026-10-10T18:13:03.690Z",
+   "available": "0.25 HYPE"
+  },
+  {
+   "name": "FAILED",
+   "at": "2026-10-10T18:13:04.726Z",
+   "e": "ApiRequestError: order 0: Order must have minimum value of 10 USDC. asset=11035"
+  }
+ ],
+ "pledge": "0x13c156409c57076550077313970ec125bca59f80",
+ "pageErrors": [],
+ "txs": [
+  "0xec1d7f18547a7e07fba5916444fcbcf578e546e76982280aeddb06717e47b888"
+ ]
+}

@@ -5,12 +5,12 @@ export const ABI = art.abi as any; export const BYTECODE = art.bytecode as `0x${
 export const DEMO = dep.address as Address; export const DEMO_TEAM = dep.team as Address; export const DEMO_DEPLOY_TX = dep.deployTx;
 export const EXPLORER = 'https://testnet.purrsec.com';
 export const hyperevmTestnet = defineChain({ id: 998, name: 'HyperEVM Testnet', nativeCurrency: { name: 'HYPE', symbol: 'HYPE', decimals: 18 }, rpcUrls: { default: { http: ['https://rpc.hyperliquid-testnet.xyz/evm'] } }, blockExplorers: { default: { name: 'Purrsec', url: EXPLORER } } });
-export const pub = createPublicClient({ chain: hyperevmTestnet, transport: http() });
+export const pub = createPublicClient({ chain: hyperevmTestnet, transport: http(undefined, { batch: { batchSize: 20, wait: 16 }, retryCount: 4, retryDelay: 1500 }) });
 export const HL_INFO = 'https://api.hyperliquid-testnet.xyz/info';
 export type State = { team: Address; cap: bigint; floor: bigint; dev: bigint; start: bigint; end: bigint; sold: bigint; pending: bigint; remaining: bigint; balance: bigint; oracle: bigint; limit: bigint };
 const FNS = ['team', 'capPerDay', 'floorPx8', 'maxDevBps', 'startTs', 'endTs', 'soldToday', 'pending', 'remainingToday', 'balance', 'oraclePx8', 'limitPx8'] as const;
 export async function readState(address: Address): Promise<State> {
-  const r = await Promise.all(FNS.map(fn => pub.readContract({ address, abi: ABI, functionName: fn }).catch(() => 0n)));
+  const r = await Promise.all(FNS.map(fn => pub.readContract({ address, abi: ABI, functionName: fn })));
   const [team, cap, floor, dev, start, end, sold, pending, remaining, balance, oracle, limit] = r as any[];
   return { team, cap, floor, dev, start, end, sold, pending, remaining, balance, oracle, limit };
 }
