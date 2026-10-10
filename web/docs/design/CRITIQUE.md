@@ -11,3 +11,5 @@
 r1 and r2 were builder self-checks (screens only, not scored).
 
 FINAL: 8.2 min=7 round=7 critic=fresh:codex-exec-r7 review=/Users/kamal/Desktop/solana/cwf/hyperliquid/projects/pledge/web/docs/design/design-audit-r7.md
+r8 7.7/5.5, r9 8.1/6.5, r10 capture flake (unstyled), r11 7.9/6.5, r12 8.1/6.5, r13 8.3/7.5
+FINAL: 8.3 min=7.5 round=13 critic=fresh:codex-exec-r13 review=/Users/kamal/Desktop/solana/cwf/hyperliquid/projects/pledge/web/docs/design/design-audit-r13.md
