@@ -21,15 +21,15 @@ export default function App() {
       <a href={r.page === 'create' ? '#/' : '#/create'} className="mast-link">{r.page === 'create' ? 'Back to the demo agreement' : 'Draft a new agreement'}</a>
     </header>
     {r.page === 'create' ? <Create /> : <Agreement addr={r.addr} />}
-    <footer className="foot"><p>Figures on this page are read live from HyperEVM testnet and HyperCore testnet. Rows marked <span className="sim">fork-simulated</span> ran on a forge fork with HyperCore mocked, and are shown only where a real run was not possible.</p></footer>
+    <footer className="foot">{r.page === 'create' ? <p>Deploying creates a new contract on HyperEVM testnet from your connected wallet. Terms are fixed at deployment.</p> : <p>Figures on this page are read live from HyperEVM testnet and HyperCore testnet. Rows marked <span className="sim">fork-simulated</span> ran on a forge fork with HyperCore mocked, and are shown only where a real run was not possible.</p>}</footer>
   </div>;
 }
 
 /* Signature component: the release staircase (Figure 1). Amber steps: cumulative HYPE the contract may sell. Navy steps: cumulative filled on HyperCore. Dots: real fills. */
 function Staircase({ start, end, cap, deposited, fills, fillsErr }: { start: number; end: number; cap: number; deposited: number; fills: Fill[]; fillsErr?: boolean }) {
-  const narrow = typeof window !== 'undefined' && window.innerWidth < 600; const days = Math.max(1, Math.round((end - start) / 86400)), W = narrow ? 360 : 760, H = narrow ? 250 : 330, L = 44, B = 30, T = 16, R = 16;
+  const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440); useEffect(() => { const o = () => setVw(window.innerWidth); window.addEventListener('resize', o); return () => window.removeEventListener('resize', o); }, []); const narrow = vw < 600; const days = Math.max(1, Math.round((end - start) / 86400)), W = narrow ? 360 : 760, H = narrow ? 250 : 330, L = 44, B = 30, T = 16, R = 16;
   const elapsed = Math.max(0, (Date.now() / 1000 - start) / 86400), shown = Math.min(days, Math.max(6, Math.ceil(elapsed) + 5));
-  const max = Math.max(cap * shown, deposited, 0.0001);
+  const max = Math.max(deposited, cap, 0.0001) * 1.6;
   const x = (d: number) => L + (d / shown) * (W - L - R), y = (v: number) => T + (1 - Math.min(v, max) / max) * (H - T - B);
   const lim = (v: number) => Math.min(v, deposited); let ghost = `M${x(0)},${y(0)}`, allow = ghost; for (let d = 0; d < shown; d++) { ghost += ` V${y(cap * (d + 1))} H${x(d + 1)}`; allow += ` V${y(lim(cap * (d + 1)))} H${x(d + 1)}`; }
   const pts = fills.filter(f => f.side === 'A').map(f => ({ d: (f.time / 1000 - start) / 86400, sz: Number(f.sz), px: f.px })).sort((a, b) => a.d - b.d);
@@ -43,7 +43,7 @@ function Staircase({ start, end, cap, deposited, fills, fillsErr }: { start: num
         {[0, 0.25, 0.5, 0.75, 1].map(f => <g key={f}><line x1={L} x2={W - R} y1={y(max * f)} y2={y(max * f)} className="grid" /><text x={L - 8} y={y(max * f) + 4} className="ax" textAnchor="end">{+(max * f).toFixed(2)}</text></g>)}
         {Array.from({ length: shown + 1 }, (_, d) => d).filter(d => !narrow || d % 2 === 0 || d === shown).map(d => <text key={d} x={x(d)} y={H - 8} className="ax" textAnchor={d === shown ? 'end' : d === 0 ? 'start' : 'middle'}>{d === 0 ? 'start' : 'day ' + d}</text>)}
         {deposited > 0 && <g><line x1={L} x2={W - R} y1={y(deposited)} y2={y(deposited)} className="dep" /><text x={W - R} y={y(deposited) - 6} className="ax depl" textAnchor="end">deposited {+deposited.toFixed(4)} HYPE</text></g>}
-        <path d={ghost} className="ghost" /><text x={x(Math.min(shown, 4)) + 6} y={y(cap * Math.min(shown, 4)) - 8} className="ax ghostl">only if more HYPE is deposited</text><path d={allow} className="allow" /><path d={sold} className="sold" />
+        <path d={ghost} className="ghost" clipPath="url(#plot)" /><clipPath id="plot"><rect x={L} y={T} width={W - L - R} height={H - T - B} /></clipPath><text x={L + 8} y={T + 14} className="ax ghostl">dashed: needs more deposits</text><path d={allow} className="allow" /><path d={sold} className="sold" />
         <line x1={x(today)} x2={x(today)} y1={T} y2={H - B} className="now" /><text x={x(today) + 6} y={T + 10} className="ax">now</text>
         {dots.map((p, i) => <g key={i}><circle cx={x(p.d)} cy={y(p.cum)} r="6" className="dot" /><text x={x(p.d) + 12} y={y(p.cum) + 18} className="ax dotl">real fill: {p.sz} HYPE @ {p.px}</text></g>)}
       </svg>
@@ -59,15 +59,15 @@ function Countdown({ to }: { to: number }) { const [n, setN] = useState(Date.now
 
 type Try = { label: string; btn: string; fn: string; args: any[]; as: 'team' | 'anyone'; rule: string; tx?: string };
 function Agreement({ addr }: { addr: Address }) {
-  const [s, setS] = useState<State | null>(null); const [err, setErr] = useState(''); const [fills, setFills] = useState<Fill[]>([]); const [fillsErr, setFillsErr] = useState(false); const [depOpen, setDepOpen] = useState(false); const [depAmt, setDepAmt] = useState('0.5');
+  const [s, setS] = useState<State | null>(null); const [err, setErr] = useState(''); const [fills, setFills] = useState<Fill[]>([]); const [fillsErr, setFillsErr] = useState(false); const [fillsLoaded, setFillsLoaded] = useState(false); const [depOpen, setDepOpen] = useState(false); const [depAmt, setDepAmt] = useState('0.5');
   const [tries, setTries] = useState<Record<string, { ok: boolean; reason: string; at: string }>>({}); const [busy, setBusy] = useState(''); const [running, setRunning] = useState(''); const [log, setLog] = useState<string[]>([]);
-  const load = useCallback(async () => { try { const [st, f] = await Promise.all([readState(addr), coreFills(addr).then(x => ({ ok: true, x })).catch(() => ({ ok: false, x: [] as Fill[] }))]); setS(st); setFillsErr(!f.ok); if (f.ok) setFills(f.x); setErr(''); } catch (e) { setErr(String(e)); } }, [addr]);
+  const load = useCallback(async () => { try { const [st, f] = await Promise.all([readState(addr), coreFills(addr).then(x => ({ ok: true, x })).catch(() => ({ ok: false, x: [] as Fill[] }))]); setS(st); setFillsErr(!f.ok); if (f.ok) { setFills(f.x); setFillsLoaded(true); } setErr(''); } catch (e) { setErr(String(e)); } }, [addr]);
   useEffect(() => { load(); const i = setInterval(load, 10000); return () => clearInterval(i); }, [load]);
   if (err) return <main className="doc-solo"><p className="bad">Could not read agreement {addr}. {err}</p><button className="btn-outline" onClick={load}>Try again</button></main>;
   if (!s) return <main className="doc-solo"><p>Reading agreement {short(addr)} from HyperEVM testnet.</p></main>;
   const cap = Number(s.cap) / 1e8, sells = fills.filter(f => f.side === 'A'), soldAll = sells.reduce((a, f) => a + Number(f.sz), 0);
-  const deposited = Number(s.balance) / 1e8 + soldAll + Number(s.pending) / 1e8, halted = s.limit < s.floor || s.oracle === 0n, isDemo = addr.toLowerCase() === DEMO.toLowerCase();
-  const proceeds = sells.reduce((a, f) => a + Number(f.sz) * Number(f.px), 0);
+  const proceedsN = sells.reduce((a, f) => a + Number(f.sz) * Number(f.px), 0);
+  const known = fillsLoaded; const soldTxt = known ? `${+soldAll.toFixed(4)} HYPE` : 'an unknown amount of HYPE'; const procTxt = known ? `${proceedsN.toFixed(2)} USDC` : 'unknown USDC'; const deposited = Number(s.balance) / 1e8 + (known ? soldAll : 0) + Number(s.pending) / 1e8, halted = s.limit < s.floor || s.oracle === 0n, isDemo = addr.toLowerCase() === DEMO.toLowerCase();
   const dayIdx = Math.floor((Date.now() / 1000 - Number(s.start)) / 86400), dayStart = Number(s.start) + dayIdx * 86400, nextDay = dayStart + 86400;
   const todays = sells.filter(f => f.time / 1000 >= dayStart);
   const TRIES: Try[] = [
@@ -88,8 +88,8 @@ function Agreement({ addr }: { addr: Address }) {
     <section className="top">
       <div className="top-text">
         <p className="ref">Agreement <a href={`${EXPLORER}/address/${addr}`} target="_blank" rel="noreferrer" className="fig">{short(addr)}</a> on HyperEVM testnet, signed by team <span className="fig">{short(s.team)}</span></p>
-        <h1>Lock agreement for {+deposited.toFixed(4)} HYPE of unlocked supply</h1>
-        <div className="now-line" role="status"><p className="avail"><span className="avail-k">Available to sell now</span> <span className="fig avail-v">{fmt8(s.remaining < s.balance ? s.remaining : s.balance)} HYPE</span> <button className="btn-outline jump" onClick={() => s.balance === 0n ? setDepOpen(true) : document.getElementById('status')?.scrollIntoView()}>{s.balance === 0n ? 'Deposit HYPE' : 'Go to actions'}</button></p><p><span className="fig">{fmt8(s.balance)} HYPE</span> locked now. <span className="fig">{+soldAll.toFixed(4)} HYPE</span> sold for <span className="fig">{proceeds.toFixed(2)} USDC</span>. {s.balance === 0n ? <>Nothing left to sell until the team deposits more.</> : <>Next allowance in <Countdown to={nextDay} />.</>}{fillsErr && <span className="bad"> Fill history unavailable right now; sold and proceeds may be stale.</span>}</p></div>
+        <h1>Lock agreement for {known ? +deposited.toFixed(4) : `at least ${+deposited.toFixed(4)}`} HYPE of unlocked supply</h1>
+        <div className="now-line" role="status"><p className="avail"><span className="avail-k">Available to sell now</span> <span className="fig avail-v">{fmt8(s.remaining < s.balance ? s.remaining : s.balance)} HYPE</span> <button className="btn-outline jump" onClick={() => s.balance === 0n ? setDepOpen(true) : document.getElementById('status')?.scrollIntoView()}>{s.balance === 0n ? 'Deposit HYPE' : 'Go to actions'}</button></p><p><span className="fig">{fmt8(s.balance)} HYPE</span> locked now. <span className="fig">{soldTxt}</span> sold for <span className="fig">{procTxt}</span>. {s.balance === 0n ? <>Nothing left to sell until the team deposits more.</> : <>Next allowance in <Countdown to={nextDay} />.</>}{fillsErr && <span className="bad"> {known ? 'Fill history unavailable right now; sold and proceeds show the last successful read.' : 'Fill history has not loaded yet, so amounts sold are unknown.'}</span>}</p></div>
         <p className="lede">The team placed this supply with a contract that sells it on the HyperCore spot book, at most {cap} HYPE a day, never below ${fmt8(s.floor, 2)}. No one can change or cancel these terms, the team included.</p>
       </div>
       <nav className="jumps" aria-label="Sections">{[['c1', 'Terms'], ['c6', 'Sales'], ['status', 'Status and actions']].map(([id, t]) => <button key={id} className="btn-text" onClick={() => document.getElementById(id)?.scrollIntoView()}>{t}</button>)}</nav>
@@ -100,7 +100,7 @@ function Agreement({ addr }: { addr: Address }) {
       <article className="doc">
         <ol className="clauses">
           <li id="c1"><h2>Tokens locked</h2>
-            <p><span className="fig">{+deposited.toFixed(4)} HYPE</span> deposited. <span className="fig">{fmt8(s.balance)} HYPE</span> is still locked on HyperCore (read live from HyperCore), and <span className="fig">{+soldAll.toFixed(4)} HYPE</span> has been sold for <span className="fig">{proceeds.toFixed(2)} USDC</span>, which the contract holds until the end date.</p></li>
+            <p><span className="fig">{+deposited.toFixed(4)} HYPE</span> deposited. <span className="fig">{fmt8(s.balance)} HYPE</span> is still locked on HyperCore (read live from HyperCore), and <span className="fig">{soldTxt}</span> has been sold for <span className="fig">{procTxt}</span>, which the contract holds until the end date.</p></li>
           <li id="c2"><h2>Maximum sale per day</h2>
             <p>At most <span className="fig">{cap} HYPE</span> of <em>filled</em> size in each 24-hour window. Today: <span className="fig">{fmt8(s.sold)}</span> sold, <span className="fig">{fmt8(s.pending)}</span> awaiting fill, <span className="fig">{fmt8(s.remaining)}</span> left. An order that does not fill returns its size to the day's allowance.</p></li>
           <li id="c3"><h2>Sale price</h2>
