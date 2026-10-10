@@ -1,0 +1,6 @@
+contracts/out
+contracts/cache
+node_modules
+scripts/node_modules
+web/dist
+.vercel

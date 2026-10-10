@@ -1,0 +1,16 @@
+{
+  "chainId": 998,
+  "address": "0x1cf99b8af3745deef01cc1c29708e10d4538e50e",
+  "deployTx": "0x1a666b8f89eca377bdeeefed7dda7978242ce9ab8fea565da503a094856579e7",
+  "block": "66502305",
+  "team": "0x0ad50d9CeB64ec252191e7fC06029B99a3b975AF",
+  "params": {
+    "asset": 11035,
+    "spotIndex": 1035,
+    "token": 1105,
+    "capPerDay": "0.5 HYPE",
+    "floor": "$5.00",
+    "bandBps": 200,
+    "days": 30
+  }
+}

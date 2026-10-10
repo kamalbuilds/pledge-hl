@@ -1,0 +1,25 @@
+{
+ "note": "forge fork of HyperEVM testnet at block 66502553, running the deployed bytecode at 0x1cf99b8af3745deef01cc1c29708e10d4538e50e. HyperCore precompiles 0x801/0x808 and CoreWriter are mocked (a fork can't run HyperCore); oracle seeded with the live 0x808 value 22.512. Tenderly has no HyperEVM network.",
+ "runs": [
+  {
+   "name": "Funded sale, full fill",
+   "detail": "0.5 HYPE IOC at oracle \u22122% ($22.061) fills; reconcile counts 0.5; next sale refused (cap)",
+   "pass": true
+  },
+  {
+   "name": "Grief: order never fills",
+   "detail": "IOC fills 0; reconcile gives the full 0.5 back to the cap",
+   "pass": true
+  },
+  {
+   "name": "Partial fill, then next day",
+   "detail": "40% fills, so 0.2 counted; next day the cap resets and 0.5 fills",
+   "pass": true
+  },
+  {
+   "name": "Oracle crashes to $5",
+   "detail": "limit $4.90 < floor $5, so sell() reverts",
+   "pass": true
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+
+No files changed, compilation skipped
+
+Ran 4 tests for test/PledgeFork.t.sol:PledgeForkTest
+[PASS] test_fork_crashBelowFloorHalts() (gas: 27945)
+[PASS] test_fork_fundedSaleFullFill() (gas: 102924)
+Logs:
+  limitPx8: 2206100000
+  sz8: 50000000
+
+[PASS] test_fork_griefNeverFillRefunds() (gas: 90959)
+[PASS] test_fork_partialFillThenNextDay() (gas: 131474)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 3.23s (2.46s CPU time)
+
+Ran 1 test suite in 3.32s (3.23s CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)

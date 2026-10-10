@@ -1,0 +1,4 @@
+{"chainId":998,"address":"0x1cf99b8af3745deef01cc1c29708e10d4538e50e","deployTx":"0x1a666b8f89eca377bdeeefed7dda7978242ce9ab8fea565da503a094856579e7","block":"66502305","team":"0x0ad50d9CeB64ec252191e7fC06029B99a3b975AF","params":{"asset":11035,"spotIndex":1035,"token":1105,"capPerDay":"0.5 HYPE","floor":"$5.00","bandBps":200,"days":30}}
+{"fn":"sell","tx":"0x605126b87e3a908104ccb495b003bd704582e6eeefc3333dcc453f11214c807f","status":"reverted"}
+{"fn":"cancel","tx":"0x6c32d94980ccd9ea5a50b2f636ef5fc752e9db5b30ca0991f09292cb50eb5c8c","status":"reverted"}
+{"fn":"release","tx":"0x2ff8266478b4200cebfca82d9184cb1ab04d74ba48fdc34598e4b4fb75c6e5d8","status":"reverted"}
