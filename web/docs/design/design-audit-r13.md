@@ -1,19 +1,21 @@
 # PLEDGE independent design audit: R13
 
-2026-10-11. Agreement and create routes. Independent report only.
+2026-10-11. Agreement and create routes. Report only.
 
 Design Score: B
 AI Slop Score: A
 
-**R13 fixes the owner's four complaints and R12's worst regression. It now looks like a deliberate financial document. It still makes one exhausted deposit occupy an oversized analytical stage, repeats its headline state, and sends judges through prose and a terminal to assemble proof. The direction is strong; the information design is not finished.**
+**R13 fixes the owner's four complaints and R12's mobile consent-order regression. It looks like a financial document with an actual design direction. It still devotes too much space to repeating an exhausted state, makes verification harder than the claims suggest, and has recovery gaps behind the polished surface. Keep the direction. Improve the information and task design.**
 
 ## Method and evidence
 
-Applied the requested [gstack design-review method](/Users/kamal/.claude/skills-disabled/gstack/design-review/SKILL.md): first impression, area and trunk tests, inferred system, ten-category checklist, task-path inspection, cross-page consistency, regression review and weighted grading. Both routes are **APP UI**. The binding Term sheet direction overrides landing-page instructions for imagery, gradients and multiple animations. Quietness is appropriate here.
+Applied the requested [design-review skill](/Users/kamal/.claude/skills-disabled/gstack/design-review/SKILL.md): first impression, area test, trunk test, system extraction, ten-category audit, flow inspection, cross-page consistency and regression review. Both routes are **APP UI**. The binding Term sheet direction overrides landing-page demands for decorative imagery and animation.
 
-The user's report-only restriction overrides the skill's repair loop, additional artifacts, configuration writes, outside reviewers and commits. Only this report was written. Read `src/App.tsx`, `src/style.css`, `DESIGN.md`, `docs/design/REFERENCES.md`, R12's audit, and relevant font/RPC declarations. Source inspection supplements the rendered audit as explicitly requested; it does not establish deployed parity.
+The user's report-only instruction overrides the skill's fix loop, configuration writes, extra reports, outside review processes and commits. No source, screenshot, configuration or other report was changed. Existing modified captures/log were preserved.
 
-| Key | Evidence | Size |
+Inspected all six R13 captures, `src/App.tsx`, `src/style.css`, `DESIGN.md`, `docs/design/REFERENCES.md`, and `docs/design/design-audit-r12.md`. Also read the RPC transport and font declarations to assess the batching/performance claims. The V2 negative reference was found at `design-research/negative/v2-termsheet-6.5-1440.png` inside this workspace and inspected.
+
+| Evidence | File | Dimensions |
 |---|---|---|
 | D | [Agreement desktop viewport](r13-1440.png) | 1440 x 900 |
 | M | [Agreement mobile viewport](r13-390.png) | 390 x 844 |
@@ -21,130 +23,123 @@ The user's report-only restriction overrides the skill's repair loop, additional
 | MF | [Agreement mobile full](shots/r13-390-full.png) | 390 x 6501 |
 | C | [Create desktop](shots/r13-create-1440.png) | 1440 x 1138 |
 | CM | [Create mobile](shots/r13-create-390.png) | 390 x 1507 |
-| V2 | [Owner's 6.5/10 negative reference](../../design-research/negative/v2-termsheet-6.5-1440.png) | Desktop viewport |
 
-Inspected all seven images. V2's actual local location is `design-research/negative/v2-termsheet-6.5-1440.png`, so its relative link above resolves within this workspace.
+Attempted the [live agreement](https://v3-review.pledge-ccs.pages.dev/) with background Brave via `minibhn deepsurge open`; SSH returned `Operation not permitted`. Web fetch could access neither agreement nor [create](https://v3-review.pledge-ccs.pages.dev/#/create). These failures establish this review's access limit, not a deployment outage. No browser tab was opened successfully or user tab navigated. No new captures were taken.
 
-Attempted the [live agreement](https://v3-review.pledge-ccs.pages.dev/) through background Brave with `minibhn deepsurge open`. SSH returned `Operation not permitted`. Web fetch could not access either that URL or [create](https://v3-review.pledge-ccs.pages.dev/#/create). These are review-access failures, not proof that the site is down. No browser was restarted, user tab navigated, new screenshot produced, or wallet action attempted. Interaction, keyboard and performance judgments below are explicitly bounded by this access failure.
+Rendered findings use the supplied captures. Source findings are labelled and do not establish deployment parity. No live click, wallet operation, keyboard traversal, tablet check, load measurement or chain-proof reproduction was completed. The skill's live goodwill score and computed-style usage counts are therefore unavailable; inventing them would weaken this audit.
 
 ## First impression and system
 
-The site communicates **an enforceable agreement with a depleted balance**. I notice that the large serif heading now distinguishes deposited supply from inventory still locked. My first three focal points are the heading, the **0 HYPE / Deposit HYPE** strip, and the navy dot at the beginning of the chart. One word: **sober**.
+The site communicates **a signed financial instrument**. I notice the large serif agreement title, the small inventory/action strip, and a very large chart containing one historical fill. My first three focal points are **the title**, **0 HYPE and Deposit HYPE**, and **the navy fill dot**. One word: **sober**.
 
-Desktop has a real composition: title and explanation, figure and table, clauses and operating rail. The right side is useful. The large amount of white space inside Figure 1 is less convincing: almost the entire plot exists to show that nothing else can happen without another deposit. The enlarged chart solves size, not usefulness.
+The header is now honest at a glance: deposited supply is labelled historical and current inventory is zero. The right-hand lede, chart table and status rail make the desktop width useful. Create has the same paper, rules and numbered structure. Its mobile version now starts with the draft and editable fields, then asks for consent. That is a real repair, not a cosmetic one.
 
-Mobile create finally starts with the draft title and editable fields, then the full recap and signing action. That is the right sequence. Mobile agreement remains a long read: 6501px, about 7.7 supplied viewport heights. Navigation jumps help, but the useful status rail is still below the initial chart and its legend.
+The agreement is still over-explained. The headline, inventory strip, figure annotation, status timeline and first clause all restate essentially the same exhausted-deposit fact. The mobile full page is 6501px, approximately 7.7 supplied viewport heights. Much of that length is evidence and terms, but repetition adds work without adding assurance.
 
-**Area test:** masthead = identity and route switch; agreement opening = identity, inventory and next action; figure = cumulative ceiling versus fills; rail = current status and actions; clauses = binding terms; Annex A = simulated checks; Annex B = verification procedure; Annex C = proposed economics; create fields = drafting; create recap = consent. All areas have identifiable jobs. The opening performs its inventory explanation repeatedly.
+**Area test:** masthead = identity/route switch; opening = agreement/current inventory; Figure 1 = cumulative ceiling/fills; status rail = current operating terms/actions; clauses = binding rules; Annex A = simulated checks; Annex B = evidence procedure; Annex C = economics; create fields = editable terms; create recap = consent. All areas have identifiable purposes. The business pitch serves a different reader from the agreement's operating controls and deserves less visual priority.
 
-**Trunk test:** agreement PARTIAL, 4/6; create PARTIAL, 4/6. Site, page, major sections and options are clear across the full captures. Current-section feedback and search are absent. Search is unnecessary at this scope and attracts no deduction. Scroll-only navigation does not preserve or announce current location.
+**Trunk test:** agreement and create are **PARTIAL, 4/6**. Identity, page purpose, major sections and options are clear. There is no section-selected indicator or search. Search is unnecessary for this scope. Scroll jumps do not preserve section location in the URL (`src/App.tsx:98`, `:161`), so they are orientation aids rather than durable navigation.
 
-**Inferred system:** Newsreader display/section titles, Manrope body/UI, DM Mono quantities and addresses; bone `#FAF8F3`, ink `#1A1D21`, slate `#5B6470`, navy `#1F3A5F`, amber allowance/lock state; fine rules, 2px controls, no decorative shadows. Main body is 16px/1.6, desktop h1 44px, mobile h1 26px. Three font roles are justified by the document, not gratuitous styling. These rendered proportions match the source declarations, but loaded-font identity was not measured live.
+**Extracted system:** Newsreader headings, Manrope prose/UI, DM Mono quantities and hashes; bone `#FAF8F3`, ink `#1A1D21`, navy `#1F3A5F`, restrained amber; fine rules, 2px controls, no decorative shadows. Source scale is 13/16/18/26/44px. Numbered clauses, the document/rail composition and full-width figure follow the reference DNA without copying another product's skin. Quantities in the main headline remain serif, a minor exception to the binding mono-for-numbers rule.
 
-Source-token contrast against bone is approximately ink 15.9:1, slate 5.6:1, navy 10.8:1, amber stroke 3.4:1 and darker amber text 5.6:1. Body colour is fixed. Readability problems now concern small type and information density rather than light grey prose. Amber stays within lock/allowance semantics.
+Opaque source-token contrast against bone: ink **15.94:1**, slate **5.65:1**, navy **10.82:1**, amber stroke **3.43:1**, darker amber text **5.57:1**. These calculations do not measure browser rendering. Amber is appropriately reserved for lock/allowance information, not general decoration. Contrast is good; consequential helper text is still small.
 
 ## Findings
 
-High = substantial task or trust harm; Medium = meaningful comprehension or completion friction; Polish = refinement. Nine Medium findings, no confirmed High finding. Each deduction is charged once to its primary category. Suggestions are report-only.
+Medium = meaningful comprehension, trust or completion friction. Polish = refinement. No Critical or High defect is established by the available rendered evidence. Each scored issue is charged once to its primary category; source risks are not described as reproduced failures.
 
-| ID | Severity / category | Where | What, consequence and specific recommendation |
+| ID | Severity / category | Where | What, consequence and report-only recommendation |
 |---|---|---|---|
-| R13-01 | **Medium / Spacing & Layout** | D, Figure 1 around y=458-757; M around y=507-711; DF/MF | **An exhausted deposit gets three days of nearly empty plot.** Only one fill and one plateau exist. Two future table rows repeat the same ceiling and omit filled values. Large scale makes this state look analytically richer than it is and postpones clauses/status. Use a shorter exhausted-state time window or a shallower plot while retaining the genuine cumulative ceiling. Do not invent steps or future fills. R12-02 survives in a reduced three-day form. |
-| R13-02 | **Medium / Content & Microcopy** | D/M, figure title, axes, table and legend; `src/App.tsx:31-48` | **The chart's quantities are not explicitly identified as cumulative.** “Ceiling” and “Filled” can be read as daily values beside rows labelled Day. The table actually sums fills up to each day and repeats the deposit-capped total. The diagram also gives no calendar date for “start.” The current one-fill fixture conceals this ambiguity. Name the columns “Cumulative ceiling” and “Cumulative filled,” give the start date once, and distinguish future rows with text rather than blank cells alone. The 0.63 top tick is rounding of 0.625, not a meaningful contract threshold. |
-| R13-03 | **Medium / Typography** | DF/MF, clause 3 table headers, clause 4 explanations and Annex B command; C/CM, minimum-order note; `src/style.css:15,49,87` | **Operational explanations are typeset like expendable metadata.** Main prose is 16px, but input constraints, minimum-order caveats, rejection evidence and the verification command use 13px. A judge or signer must read these to understand whether the mechanism works. Promote explanatory prose to body size; keep timestamps, source captions and hashes compact. Do not globally enlarge every label. This is a size failure, not a contrast failure. |
-| R13-04 | **Medium / Responsive Design** | CM, draft heading and fields; compare C's explicit permanence paragraph; `src/style.css:93` | **The mobile form hides the plain-language warning that signed terms cannot be loosened.** Desktop says this immediately below the title. Mobile omits that paragraph and only reaches the no-cancellation recap much later. The confirmation dialog retains an explicit warning in source, so this is not a claim of unconsented signing. Keep one short permanence sentence near the mobile title rather than hiding the entire lede. |
-| R13-05 | **Medium / Content & Microcopy** | DF/MF, Annex B, first and third evidence steps; `src/App.tsx:176-179` | **The proof procedure still makes the judge locate and interpret evidence.** `contracts/src/Pledge.sol` is an unlinked repository path. The explorer address appears twice without a direct verified-source link. Clause 6 is linked, but the independent check is a wrapped terminal command plus knowledge of side “A.” Link the exact repository file and the relevant explorer source/read surface if available. Put the current agreement's direct fill evidence before the optional command. Retain the command as a reproducibility fallback. Removing “60 seconds” repairs honesty, not usability. |
-| R13-06 | **Medium / Content & Microcopy** | DF/MF, Annex C fee paragraph and market block; `src/App.tsx:186-188` | **The comparison implies more pricing completeness than it provides.** Streamflow's quoted vesting fee is its free-plan/SDK case, while subscriptions change that treatment. Sablier's withdrawal charge has release-specific scope. The same paragraph switches from “proposed” to “A team only pays,” which can sound like implemented billing. Label the competitor figures as scoped examples and use conditional language for PLEDGE's proposed fee. The huge unlock totals are honest illustration, but dominate a section that contains no demonstrated purchase decision. Shorten the illustration; lead with payer and charge basis. |
-| R13-07 | **Medium / Interaction States** | MF, inline transaction/source links in clauses and annexes; DF's small clause index; `src/style.css:92` | **Evidence links remain small targets even though standalone controls were enlarged.** The mobile 44px rule covers buttons and named navigation classes, not inline hash/source links. In the capture these remain single small lines among dense text. Missed taps are likely precisely where a judge needs evidence. Give key proof destinations their own comfortably spaced link rows. Live hit-box measurements were unavailable; this finding is supported by rendered link density and the source selectors, not a completed touch test. |
-| R13-08 | **Medium / Interaction States** | M, Terms/Sales/Status/For judges/Business; DF, clause index; `src/App.tsx:96,163,177-178` | **Section navigation scrolls without managing focus or retaining location.** Source handlers call `scrollIntoView()` and prevent the anchor default; mobile jumps are buttons. A keyboard or assistive-technology user can remain focused at the old navigation while the viewport moves, and the URL cannot restore the section. Retain route-safe section state and move focus to the destination heading. Do not simply assign `#c4`, because this app already uses the hash for routing. **Source-confirmed risk at the screenshot-visible controls; actual keyboard behavior was not exercised.** |
-| R13-09 | **Medium / Visual Hierarchy & Composition** | D/M opening; DF/MF status and clause 1 | **The exhausted state is explained repeatedly before useful detail.** The h1 says 0.5 deposited/0 locked; the strip repeats zero available; the next paragraph repeats locked/sold/nothing left; the chart annotation repeats all sold; clause 1 repeats the accounting again. The h1 repair is correct, but lower-level duplication now dilutes it. Keep the h1, action strip and proceeds fact; remove the redundant inventory sentence. Preserve full accounting in clause 1. On desktop this also removes the stranded final “more.” line. |
+| R13-01 | **Medium / Visual Hierarchy & Composition** | D/M opening; DF/MF status and clause 1; `src/App.tsx:93-95`, `:107`, `:143-155` | **Exhaustion is repeated instead of progressively explained.** The title now distinguishes deposited and locked amounts correctly, but the strip repeats zero locked, and the plot and rail repeat everything sold/nothing left. In M, this consumes precious first-screen space. Keep the heading distinction; let the adjacent strip state proceeds and the next useful action rather than repeat the heading. Each later section should add evidence or a term. |
+| R13-02 | **Medium / Spacing & Layout** | D/M Figure 1; `src/App.tsx:31-48`, `src/style.css:33` | **The big chart is still mostly empty plotting space.** Shortening six days to three helps, but there is one fill and a deposit-capped plateau across all three days. The three-row table repeats the same ceiling twice with empty future-fill cells. A signature chart should explain the mechanism, not merely occupy enough pixels to close the old complaint. Make this exhausted state more compact or explain the deposit cap directly; reserve a substantial staircase for a state with meaningful steps. Do not fabricate steps. |
+| R13-03 | **Medium / Typography** | C/CM maximum-sale helper; DF/MF evidence/code; `src/style.css:15`, `:83`, `:89`; `src/App.tsx:208` | **Decision-critical prose is treated as metadata.** The minimum-order caveat is a three-line 13px paragraph on a phone. It explains whether the immutable daily cap can produce executable orders, not optional background. Command text and provenance explanations also demand close reading at 13px. Keep labels compact, but promote consequential warnings and instructions to body size. The ink body is strong; small slate prose is the remaining readability problem. |
+| R13-04 | **Medium / Responsive Design** | M/CM opening; `src/style.css:93`, `src/App.tsx:96`, `:206` | **Mobile removes the explanation of the commitment.** Both route ledes are hidden below 480px. M retains the amounts but loses the compact explanation of daily cap, floor and fixed terms; CM loses the direct warning that terms cannot be loosened. Later clauses/recap and the source-defined confirmation dialog retain safeguards, so this is not evidence of uninformed signing. Keep a short mobile version of the commitment sentence instead of deleting it. |
+| R13-05 | **Medium / Interaction States** | Clause 4 simulations; `src/App.tsx:77`, `:121-125` | **A failed network check consumes its own retry control.** Once a result exists, the simulation button is replaced by a verdict, including “Could not check (network).” There is no visible rerun control. A judge encountering transient RPC trouble must reload and lose the other results. Retain a retry action for network failures. **Source-only; no network failure was triggered live.** |
+| R13-06 | **Medium / Interaction States** | Create quote failure/minimum-order gate; `src/App.tsx:195-196`, `:208`, `:219` | **Minimum-order validation fails open when its quote fails.** `priceReady = mid > 0 || midErr` permits signing after a price-fetch error, with a warning and no minimum-cap check. The warning is honest, but a user can still deploy fixed terms whose daily allowance is too small to execute at the current price. Provide quote retry and distinguish checked from unchecked review states before irreversible deployment. This does not mean a successful quote guarantees future execution; the existing repricing caveat correctly says otherwise. **Source-only.** |
+| R13-07 | **Medium / Interaction States** | Deposit confirmation; `src/App.tsx:84` | **Balance matching is still weaker than transfer attribution.** R13 only says the entered amount is locked when the observed increase matches it, and reports the actual change otherwise. That repairs the previous obvious overstatement. A concurrent deposit of the same amount can still satisfy the success predicate, and a concurrent sale can conceal a completed transfer. Attribute completion to the transfer, or restrict success language to the observed balance. **Residual source risk, not a reproduced deposit error.** |
+| R13-08 | **Medium / Content & Microcopy** | DF/MF Annex B; `src/App.tsx:176-181` | **The judge must assemble the proof.** The exact contract source is a plain repository path, both explorer links lead to the same address page, and bytecode presence alone does not establish that the linked project source is what was deployed. Current agreement evidence and a separate wallet-test agreement are labelled but interleaved. Link the exact source and deployed-code verification evidence; group current-agreement proof separately from historical workflow proof. The terminal command is a useful alternative, not a substitute for a direct inspection path. No claim is labelled false merely because live verification was inaccessible. |
+| R13-09 | **Medium / Content & Microcopy** | DF/MF Annex C; `src/App.tsx:186-188` | **The comparison omits fee scope and the market paragraph overpowers the buyer case.** Streamflow's quoted vesting price depends on plan/interface, and Sablier's quoted withdrawal charge applies to specified newer releases. The annex states both too universally. Its revenue illustration is explicitly hypothetical, but detailed global totals and projected fees receive more space than the reason a team would pay. Qualify the comparisons and subordinate the illustration. Preserve the payer, fee basis and clear proposed-fee label. |
 
-Polish, no deductions: “all 0.5 HYPE deposited is sold” is awkward; “All deposited HYPE sold” is cleaner. Figure 1's “now” guide passes through the mobile annotation, reducing clarity. Visited links have no distinct styling. The create date value breaks across two lines with a long timezone string. Desktop sale hashes are plain text while mobile hashes are links, an inconsistent proof affordance. `.attrs dd` and form-padding overrides contain conflicting older declarations and `!important`; that is maintenance debt, not evidence that the rendered result is broken.
+Polish, no deduction: the 0.625 chart ceiling rounds to an awkward `0.63`; M hides the day-1 tick despite displaying days 2 and 3; “all 0.5 HYPE deposited is sold” is stiff; blank future table cells could explicitly mean future; visited links lack distinct styling; disabled controls use `cursor:default`; the short wordmark and inline evidence links lack the mobile target sizing assigned to buttons. Tablet overflow and exact target rectangles were not measured. The summary and fields repeat long dates, but that repetition supports consent and should not be removed indiscriminately.
 
 ## Owner complaints a-d
 
 | Complaint | Fixed? | Evidence |
 |---|---|---|
-| a. Disabled button dominated | **Yes, captured agreement** | V2's large grey allowance slab is gone. Inventory exhaustion is text; Deposit HYPE is an outline action. No disabled primary dominates D or M. Create's enabled signing action is appropriate. Pending/busy states were not observed live. |
-| b. Right side empty | **Yes, desktop** | D/DF have the supporting explanation, day table and populated status/timeline rail. C has a useful consent recap. Space below a shorter rail is legitimate document whitespace, not automatically a defect. |
-| c. Chart small | **Yes** | Figure 1 is a major full-width section with a large plot and adjacent table; mobile is legible at native viewport scale. R13-01 is the opposite problem: excessive footprint for this dataset. |
-| d. Body too light grey | **Yes** | Main narrative and terms use ink. Slate supports metadata and retains sufficient token contrast. R13-03 concerns operational text size, not recurrence of the grey-body failure. |
-
-These closures do not award credit for alternate loaded, pending, multi-day or wallet states absent from the supplied captures.
+| a. Disabled button dominated | **Yes, captured agreement** | V2's broad grey “Today's allowance is used” slab is gone. Exhaustion is text and Deposit HYPE is a restrained outline action. The valid navy create CTA is appropriate. Invalid/loading create states were not captured. |
+| b. Right side empty | **Yes, desktop** | The lede, figure value table and populated status rail perform distinct jobs. Create has a useful terms recap. Remaining space below a shorter rail is normal document space, not a reason to add decoration. |
+| c. Chart small | **Yes** | Figure 1 occupies a full-width section, with a roughly 780px desktop plot and readable phone plot. Size is solved. State-specific information density remains R13-02. |
+| d. Body too light grey | **Yes** | Main prose is 16px ink. Slate metadata has adequate calculated contrast. The separate problem is small consequential helper text, R13-03. |
 
 ## R12 closure check
 
-| Prior finding | R13 status |
+| Previous finding | R13 status |
 |---|---|
-| R12-01: mobile consent before editing | **Fixed in CM.** Draft title and fields precede recap; signing follows it around y=1273. Source scopes rail-first ordering to `.cols:not(.create)`. No repeated keyboard test was possible. |
-| R12-02: oversized exhausted-deposit chart | **Partly fixed.** Window now shows three days rather than six; plateau still consumes most of the analytical space. R13-01. |
-| R12-03: heading implies present inventory | **Fixed in D/M.** “0.5 HYPE deposited, 0 still locked” is explicit and accurate for this fixture. |
-| R12-04: 60-second promise and universal sale lead | **Fixed in visible copy.** Annex B now says “how to verify it on-chain”; its fill lead is agreement-specific and explains the empty-list case. This does not establish that the linked evidence is correct. |
-| R12-05: fragmented evidence procedure | **Partly fixed.** The absent-capability badge is removed; real/fork provenance remains clear. Exact source link is still missing; judge still assembles the procedure. R13-05. |
-| R12-06: deposit increase reported as full entered amount | **Source wording substantially fixed.** The full locked-amount claim now requires a matching balance increase; a differing increase reports sent amount and observed delta separately. Timeout remains cautious. Concurrent equal-sized deposits and concurrent sales still prevent reliable attribution. No actual transfer was reproduced. |
-| R12-07: no clipboard failure state | **Source fixed.** Both rejection and absent Clipboard API set a failed state with manual-copy guidance. Screenshot shows the control, not the failed/success states; live closure remains unverified. |
+| R12-01: mobile create consent before editing | **Rendered fixed.** CM shows the draft title around y=145, fields from y=198, recap around y=878 and action around y=1273. CSS scopes rail-first ordering to `.cols:not(.create)`. The action is lower again because the sequence is now correct. |
+| R12-02: oversized six-day exhausted plateau | **Partly fixed.** Captures now show three days; source chooses an elapsed-relative window. One dot and a plateau still dominate, R13-02. |
+| R12-03: headline quantity reads as current stock | **Rendered fixed.** “0.5 HYPE deposited, 0 still locked” explicitly distinguishes history and inventory. New repetition is R13-01, not the old ambiguity. |
+| R12-04: timed verification promise and unconditional sale lead | **Rendered/source fixed in wording.** The title removes the time claim; the lead says to check this agreement's fills and explicitly allows an empty list. Live proof itself was not reproduced. |
+| R12-05: fragmented evidence and public delivery-accounting badge | **Partly fixed.** The absent-capability badge is gone, real/fork scope remains explicit, and the fill query is copyable. Exact source linkage and direct proof packaging remain R13-08. The replacement real-testnet refund claim has not been independently checked. |
+| R12-06: any increase claims the entire deposit locked | **Substantially source fixed.** Exact matching is required for that message; otherwise actual balance change is reported. Transfer attribution remains R13-07. |
+| R12-07: clipboard rejection unhandled | **Source fixed.** Clipboard absence/rejection selects a failure state and instructs manual copying. No live clipboard denial was exercised. |
 
 ## Annex clarity and honesty
 
-**Annex B:** Its title is now appropriately modest. Bold leads divide contract existence, rejection checks, fills and a separate wallet run. The distinction between this agreement and the separate tested agreement is explicit. Real-testnet badges and fork-simulated scope remain visible. The footer explicitly says HyperCore was mocked in the forge fork. This is materially better than blending those results into a claim of live multi-day execution.
+**Annex B is more honest, but still not an efficient proof surface.** Removing the timing promise and scoping fills to the viewed agreement are substantial improvements. The expiry and RPC explanations avoid pretending every failed simulation proves a contractual restriction. The separate wallet-test agreement is explicitly named. Real testnet results and fork-simulated multi-day/withdrawal checks remain differentiated.
 
-The paragraph about rejected calls explains term expiry and network failure. Good. It still asks a judge to trust the attached labels until they follow several links, run simulations and inspect JSON. The command is independently useful, but not a substitute for direct proof destinations. A deployed bytecode page alone does not establish correspondence with the unlinked repository source. The linked historical wallet transactions and claimed fill were not independently opened successfully in this audit; they remain claims with pointers, not newly verified results.
+The source-path problem remains. A reader should not need to locate a repository, navigate its tree, then decide whether source and bytecode match. The wallet-flow paragraph links deployment, sale and reconciliation but supplies no direct deposit transaction/reference beside its deposit claim. The refund row now says an earlier IOC was cancelled and refunded without linking that instance there. Those are proof-packaging gaps, not established fabrications. Transaction validity, source correspondence, the deposit and refund were not independently established in this review.
 
-**Annex C:** Payer and fee basis are concrete. The proposed fee is explicitly absent from the testnet contract. Gas is distinguished from protocol fees. The market paragraph explicitly refuses to treat global unlock volume as Hyperliquid demand or willingness to pay. That qualification is honest and should survive any shortening.
+**Annex C is candid about the proposed fee and hypothetical revenue.** It names the token team/foundation as payer and distinguishes sale-proceeds fees from allocation fees. It does not present the global market illustration as traction or local willingness to pay. The arithmetic is correct: 18.77 billion x 1% x 0.25% = 469,250, approximately 470 thousand.
 
-The illustrative arithmetic is correct: 18.77 billion x 1% x 0.25% = 469,250, approximately 470 thousand. It proves multiplication, not revenue potential. Tokenomist's linked page could not be fetched, so the underlying market totals were not independently confirmed.
+The linked [Streamflow fee breakdown](https://streamflow.finance/blog/how-much-does-streamflow-cost) supports the base vesting/lock charges but describes subscription-dependent vesting treatment. [Sablier's fee documentation](https://docs.sablier.com/concepts/fees) supports the withdrawal charge specifically for Lockup v2.0+ and Flow v1.1+. These qualifications are omitted from Annex C. The linked Tokenomist report could not be fetched, so market totals are unverified here. The proposed fee is visibly distinguished from current contract behavior; no demand validation follows from naming a payer.
 
-Checked the two accessible first-party pricing sources. [Streamflow's published breakdown](https://streamflow.finance/blog/how-much-does-streamflow-cost) supports the quoted base fees but distinguishes free-plan/SDK vesting from subscription treatment. [Sablier's fee documentation](https://docs.sablier.com/concepts/fees) supports the withdrawal price and limits it to Lockup v2.0+ and Flow v1.1+. Those scopes are missing from the annex. Comparing fees on allocated tokens with fees on realised sale proceeds is useful as a basis comparison; it does not show which service is cheaper for a particular team.
+## Ten-category grades
 
-## Ten-category grading
+Skill rule: start at A; High deducts one letter step, Medium half a step, Polish zero. Use the same convention as R12: A=0, B=1, C=2, D=3, F=4; half-step category labels display the weaker letter while weighting retains fractions. Round the overall weighted deduction to the nearest letter step. Provisional A means no confirmed deduction, not a runtime pass.
 
-Skill rubric: start at A; High deducts one letter step, Medium half a step, Polish zero. A=0, B=1, C=2, D=3, F=4. Half-step categories display the weaker letter while retaining fractions for weighting. Overall rounds weighted deduction to the nearest letter step, matching R12's stated convention. Provisional A means no confirmed deduction, not a runtime pass.
-
-| Category | Weight | Grade | Deduction and basis |
+| Category | Weight | Grade | Deduction / basis |
 |---|---:|---|---|
-| Visual Hierarchy & Composition | 15% | B | 0.5: R13-09. State is accurate but repeated across competing summaries. |
-| Typography | 15% | B | 0.5: R13-03. Strong font roles; operational prose remains 13px. |
-| Color & Contrast | 10% | A | 0. Coherent semantic palette and adequate source-token contrast. |
-| Spacing & Layout | 15% | B | 0.5: R13-01. Useful desktop rail; plot footprint exceeds exhausted-state information. |
-| Interaction States | 10% | B | 1.0: R13-07/08. Small evidence targets and scroll-only focus/location handling. Copy recovery improved. |
-| Responsive Design | 10% | B | 0.5: R13-04. Correct create sequence; mobile hides early permanence explanation. Tablet/other widths unobserved. |
-| Motion & Animation | 5% | A, provisional | 0. Source specifies restrained colour transitions and reduced-motion handling; live motion unobserved. No deduction for lack of decorative animation. |
-| Content & Microcopy | 10% | C | 1.5: R13-02/05/06. Cumulative semantics, fragmented proof and under-scoped economics comparison. |
-| AI Slop Detection | 5% | A | 0. No generic feature grid, gradient typography, floating tags, decorative icon circles, bubbly cards or funnel rhythm. |
-| Performance as Design | 5% | A, provisional | 0 confirmed deductions. RPC batching/retries and font preconnect/swap exist. No measured LCP, CLS, response latency or font flash. |
+| Visual Hierarchy & Composition | 15% | B | 0.5: R13-01. Correct state labelling, excessive repetition. |
+| Typography | 15% | B | 0.5: R13-03. Strong type identity, consequential 13px prose. |
+| Color & Contrast | 10% | A | 0. Coherent semantic palette; calculated relevant token contrasts pass. |
+| Spacing & Layout | 15% | B | 0.5: R13-02. Desktop balance repaired; exhausted figure remains oversized. |
+| Interaction States | 10% | C | 1.5: R13-05/06/07. Network retry, unchecked quote consent and residual attribution. |
+| Responsive Design | 10% | B | 0.5: R13-04. Correct create ordering, commitment explanation deleted on phones. |
+| Motion & Animation | 5% | A, provisional | 0. Source defines restrained 150ms color transitions and reduced-motion suppression. Runtime unobserved. |
+| Content & Microcopy | 10% | B | 1.0: R13-08/09. Proof linkage and comparison scope. |
+| AI Slop Detection | 5% | A | 0. No generic card funnel, gradient hero, blobs, floating pills, ornamental icons or bubbly surfaces. |
+| Performance as Design | 5% | A, provisional | 0 confirmed deductions. RPC HTTP batching, parallel reads and font preconnect/swap exist. LCP, CLS, rendered batch behavior and latency were not measured. |
 
-Weighted deduction = **0.525 letter steps**, therefore **B**. R12 also computed 0.525: that numerical tie does not mean no progress. R13 resolves serious old findings while this review identifies residual typography, navigation and chart-semantic friction. Do not treat two differently scoped audits as a controlled quantitative experiment.
+Weighted deduction = **0.525 steps**, rounded to **B**. R12 also scored B at 0.525. Equal aggregate does not mean equal defects: R13 fixes the main ordering and wording problems; this audit identifies smaller remaining risks in mobile explanation, helper typography and recovery. The skill's generous A baseline makes the concrete findings more useful than the headline alone.
 
-**AI Slop verdict: A. The numbered financial instrument, serif/mono roles, hairline rules and meaningful rail make the product recognisable. Its problems are repeated information and proof friction. Changing the visual direction would discard its best work.**
+**AI Slop verdict: A.** A recognisable financial document with deliberate type roles and restrained semantic colour. Its weakness is editorial and operational friction, not a generic template.
 
-Litmus checks: product unmistakable **YES**; strong visual anchor **YES**; understandable from headlines **YES, with cumulative chart semantics needing body explanation**; each section one job **YES**; cards necessary **NO, decorative cards correctly absent**; motion improves hierarchy **UNOBSERVED**; credible without shadows **YES**. No applicable SaaS-grid, decorative-image or stacked-card hard rejection. The first screen offers a clear action.
-
-No invented interaction narration, word-count percentage or goodwill meter: screenshots do not record a completed user journey.
+Litmus: product unmistakable **YES**; strong visual anchor **YES**; understandable by headlines **YES**, with repetition; one job per section **YES**; cards necessary **NO**, decorative cards absent; motion improves hierarchy **UNVERIFIED**; credible without shadows **YES**. No hard-rejection grid, stacked-card workspace or weak-action hero is established.
 
 ## Quick wins, report only
 
-1. Remove the redundant inventory sentence under the h1; retain sale proceeds and next action.
-2. Name chart/table values as cumulative and add the start date.
-3. Link the exact contract source and make key evidence links separately tappable.
-4. Restore a one-sentence permanence warning above mobile create fields.
-5. Qualify competitor price examples and keep proposed-fee sentences conditional.
+1. Keep one concise statement of current inventory in the opening; make the supporting strip add proceeds/action context.
+2. Restore a short fixed-terms sentence on mobile and promote the minimum-order caveat to body text.
+3. Retain Retry after simulation network errors; offer quote retry before unchecked review.
+4. Link the exact source and proof artifacts beside Annex B's claims.
+5. Qualify Annex C's fee comparisons and visually subordinate its hypothetical market illustration.
 
-Zero fixes applied. No product files changed. No build/test suite was needed for a prose-only audit; the report structure and score arithmetic were checked.
+Nine Medium findings, zero source fixes. None of the recommended changes was implemented.
 
-Blind spot: supplied captures and local source cannot establish deployment parity, linked on-chain proof, clipboard/dialog/keyboard behavior, wallet completion, multi-day chart correctness, tablet layout or runtime performance.
+Blind spot: supplied captures and local source cannot establish deployment parity, live completion/recovery, dialog/keyboard accessibility, multi-day chart behavior, chain-proof validity or runtime performance.
 
 ## Scores
 
-Independent 0-10 assessment across both routes, separate from the letter rubric. Eight scores sum to 66.5; mean 8.3125, rounded to one decimal. Chart clarity and mobile remain the weakest dimensions.
+Independent 0-10 visual/task assessment across both routes, separate from the weighted letter rubric. Sum 66.5; mean 8.3125, rounded to one decimal. Remaining chart density and page length constrain the minimum.
 
 ```text
-hierarchy=8.5
-layout/space use=8
-typography=8.5
+hierarchy=8
+layout/space use=7.5
+typography=9
 colour/contrast=9
 distinctiveness (not AI-generic)=9
 fidelity to the Term sheet direction=8.5
 data/chart clarity=7.5
-mobile=7.5
+mobile=8
 AVERAGE=8.3 MIN=7.5
 ```
