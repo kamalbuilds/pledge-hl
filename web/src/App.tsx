@@ -9,6 +9,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 type Fill = { coin: string; px: string; sz: string; side: string; time: number; hash: string };
 const route = () => { const h = location.hash.replace(/^#\/?/, ''); if (h.startsWith('create')) return { page: 'create' as const }; if (h.startsWith('judges')) return { page: 'judges' as const, addr: DEMO as Address }; if (h.startsWith('business')) return { page: 'business' as const, addr: DEMO as Address }; const m = h.match(/^p\/(0x[0-9a-fA-F]{40})/); return { page: 'pledge' as const, addr: (m ? m[1] : DEMO) as Address }; };
 const dt = (s: number) => new Date(s * 1000).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+type Tx = { phase: 'idle' | 'wallet' | 'pending' | 'confirmed' | 'failed'; hash?: string; msg?: string };
+const TxState = ({ t }: { t: Tx }) => t.phase === 'idle' ? null : <div className={'txs ' + t.phase} role="status"><span className={'chip ' + (t.phase === 'confirmed' ? 'ok' : t.phase === 'failed' ? 'bad' : 'warn')}>{t.phase === 'wallet' ? 'Waiting for wallet' : t.phase === 'pending' ? 'Pending on testnet' : t.phase === 'confirmed' ? 'Confirmed' : 'Failed'}</span>{t.hash && <a className="link mono" href={`${EXPLORER}/tx/${t.hash}`} target="_blank" rel="noreferrer">{short(t.hash)}</a>}{t.msg && <span className="muted">{t.msg}</span>}</div>;
+const usd = (v: number) => '$' + v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const go = (id: string) => { const el = document.getElementById(id); if (!el) return; el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true }); el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); };
 const Addr = ({ a, kind = 'address' }: { a: string; kind?: 'address' | 'tx' }) => <a className="link mono" href={`${EXPLORER}/${kind}/${a}`} target="_blank" rel="noreferrer" title={a}>{short(a)}</a>;
 
@@ -18,6 +21,7 @@ export default function App() {
   return <div className="shell">
     <header className="topbar">
       <a href="#/" className="brand"><span className="brand-mark" aria-hidden>P</span>Pledge</a>
+      <span className="chip ok net-badge" title="Chain 998">Hyperliquid testnet</span>
       <nav className="tabs" aria-label="Pages">{([['#/', 'Agreement', 'pledge'], ['#/judges', 'For judges', 'judges'], ['#/business', 'Business', 'business']] as const).map(([h, t, p]) => <a key={p} href={h} className={'tab' + (r.page === p ? ' on' : '')} aria-current={r.page === p ? 'page' : undefined}>{t}</a>)}</nav>
       {r.page === 'create' ? <a href="#/" className="btn btn-secondary">Back to demo agreement</a> : <a href="#/create" className="btn btn-secondary">Draft a new agreement</a>}
     </header>
@@ -26,7 +30,8 @@ export default function App() {
   </div>;
 }
 
-function Chart({ start, end, cap, deposited, fills }: { start: number; end: number; cap: number; deposited: number; fills: Fill[] }) {
+function Chart({ start, end, cap, deposited, fills, px }: { start: number; end: number; cap: number; deposited: number; fills: Fill[]; px: number }) {
+  const [hov, setHov] = useState<number | null>(null);
   const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440); useEffect(() => { const o = () => setVw(window.innerWidth); addEventListener('resize', o); return () => removeEventListener('resize', o); }, []);
   const narrow = vw < 600, fs = narrow ? 13 : 12, days = Math.max(1, Math.round((end - start) / 86400)), W = narrow ? 340 : 720, H = narrow ? 200 : 220, L = 44, B = 28, T = 16, R = 16;
   const elapsed = Math.max(0, (Date.now() / 1000 - start) / 86400), shown = Math.min(days, Math.max(3, Math.ceil(elapsed) + 2));
@@ -36,13 +41,17 @@ function Chart({ start, end, cap, deposited, fills }: { start: number; end: numb
   let cum = 0, sold = `M${x(0)},${y(0)}`; const dots = pts.map(p => { sold += ` H${x(p.d)}`; cum += p.sz; sold += ` V${y(cum)}`; return { ...p, cum }; }); const today = Math.min(shown, elapsed); sold += ` H${x(today)}`;
   const ticks = [0, lim(cap * shown) / 2, lim(cap * shown)];
   return <figure className="fig1 chart" style={{ margin: 0 }}>
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Ceiling ${+lim(cap * shown).toFixed(4)} HYPE; ${+cum.toFixed(4)} HYPE filled`}>
+    <div style={{ position: 'relative' }}>
+    <svg onMouseLeave={() => setHov(null)} onMouseMove={e => { const b = (e.currentTarget as SVGSVGElement).getBoundingClientRect(); const vx = (e.clientX - b.left) / b.width * W; setHov(Math.max(0, Math.min(shown, (vx - L) / (W - L - R) * shown))); }} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Ceiling ${+lim(cap * shown).toFixed(4)} HYPE; ${+cum.toFixed(4)} HYPE filled`}>
       {ticks.map(v => <g key={v}><line x1={L} x2={W - R} y1={y(v)} y2={y(v)} className="grid-l" /><text x={L - 8} y={y(v) + 4} className="ax" fontSize={fs} textAnchor="end">{+v.toFixed(2)}</text></g>)}
       {Array.from({ length: shown + 1 }, (_, d) => d).filter(d => !narrow || d % 2 === 0 || d === shown).map(d => <text key={d} x={x(d)} y={H - 6} className="ax" fontSize={fs} textAnchor={d === shown ? 'end' : d === 0 ? 'start' : 'middle'}>{d === 0 ? 'start' : 'day ' + d}</text>)}
-      <path d={allow} className="allow" /><path d={sold} className="sold" />
+      <text x={4} y={T + 4} className="ax" fontSize={fs}>HYPE</text><path d={allow} className="allow" /><path d={sold} className="sold" />
       <line x1={x(today)} x2={x(today)} y1={T} y2={H - B} className="now" /><text x={x(today) + 6} y={T + 12} className="ax" fontSize={fs}>now</text>
       {dots.map((p, i) => <g key={i}><circle cx={x(p.d)} cy={y(p.cum)} r="6" className="dot" />{i === dots.length - 1 && <text x={x(p.d) > W * 0.4 ? x(p.d) - 12 : x(p.d) + 12} textAnchor={x(p.d) > W * 0.4 ? 'end' : 'start'} y={y(p.cum) + 22} className="lbl" dy={-30}>{p.cum >= deposited - 1e-9 ? `all ${+p.cum.toFixed(4)} HYPE sold` : `${+p.cum.toFixed(4)} HYPE filled`}</text>}</g>)}
+      {hov !== null && <line x1={x(hov)} x2={x(hov)} y1={T} y2={H - B} className="grid-l" strokeWidth={2} />}
     </svg>
+    {hov !== null && (() => { const d = Math.ceil(hov) || 1, ceil = lim(cap * d), filled = pts.filter(p => p.d <= hov).reduce((a, p) => a + p.sz, 0); return <div className="tip" style={{ left: `${Math.min(70, x(hov) / W * 100)}%` }}><b>Day {d}</b><span>Ceiling {+ceil.toFixed(4)} HYPE ({usd(ceil * px)})</span><span>Filled {+filled.toFixed(4)} HYPE ({deposited ? Math.round(filled / deposited * 100) : 0}% of deposit)</span></div>; })()}
+    </div>
     <figcaption className="legend"><span><i style={{ background: '#3F7A1F' }} />Ceiling: most that may have sold</span><span><i style={{ background: '#0E0F0C' }} />Filled on HyperCore</span><span><i style={{ background: '#9FE870', height: 8, width: 8, borderRadius: 4 }} />Real fill</span></figcaption>
   </figure>;
 }
@@ -78,22 +87,23 @@ function Agreement({ addr }: { addr: Address }) {
   const used = s.remaining === 0n || s.balance === 0n; const depOk = /^\d+(\.\d{1,8})?$/.test(depAmt) && Number(depAmt) > 0 && Number(depAmt) <= 1e6;
   const nowS = Date.now() / 1000, before = nowS < Number(s.start), ended = nowS >= Number(s.end);
   const release = () => act('Withdraw', async () => { const w = await wallet(); const h = await w.writeContract({ address: addr, abi: ABI, functionName: 'release', args: [1105n, s.balance], chain: w.chain, account: w.account! }); const rc = await pub.waitForTransactionReceipt({ hash: h }); if (rc.status !== 'success') throw new Error(`withdraw reverted, tx ${short(h)}`); return `Remainder withdrawn to the team, tx ${short(h)}`; });
+  const px = Number(s.oracle) / 1e8; const [updated] = [new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })];
   const avail = before || ended ? 0n : s.remaining < s.balance ? s.remaining : s.balance; const fullySold = s.balance === 0n && known && soldAll > 0; const pct = cap > 0 ? Math.min(100, Number(s.sold) / 1e8 / cap * 100) : 0;
   return <main>
     <section className="band" aria-label="Summary">
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ display: 'grid', gap: 8 }}>
-          <p className="addr">Lock agreement <Addr a={addr} /> · team <Addr a={s.team} /></p>
+          <p className="addr">Lock agreement <Addr a={addr} /> · updated {updated} · team <Addr a={s.team} /></p>
           <h1>{known ? +deposited.toFixed(4) : `≥ ${+deposited.toFixed(4)}`} HYPE pledged, sold on a schedule</h1>
           <p className="sub">At most {cap} HYPE a day on the HyperCore book, never below ${fmt8(s.floor, 2)}. Nobody can cancel it, the team included.</p>
         </div>
         <div className="chips">{fullySold ? <span className="chip ok">Fully sold</span> : ended ? <span className="chip neutral">Term ended</span> : before ? <span className="chip warn">Scheduled</span> : s.balance === 0n ? <span className="chip warn">Awaiting deposit</span> : halted ? <span className="chip bad">Halted: under floor</span> : <span className="chip ok">Active</span>}<span className="chip dark">Not cancelable</span><span className="chip dark">Testnet</span></div>
       </div>
       <div className="metrics now-line" role="status">
-        <div className="metric"><div className="k">Available to sell now</div><div className="v avail-v">{fmt8(avail)} HYPE</div></div>
-        <div className="metric"><div className="k">Locked now</div><div className="v">{fmt8(s.balance)}<small>HYPE</small></div></div>
-        <div className="metric"><div className="k">Sold to date</div><div className="v">{known ? +soldAll.toFixed(4) : '?'}<small>HYPE</small></div></div>
-        <div className="metric"><div className="k">Gross sale proceeds</div><div className="v">{known ? proceedsN.toFixed(2) : '?'}<small>USDC</small></div></div>
+        <div className="metric hl"><div className="k">Available to sell today</div><div className="v avail-v">{fmt8(avail)} HYPE</div><div className="c">≈ {usd(Number(avail) / 1e8 * px)} · {cap ? Math.round(Number(avail) / 1e8 / cap * 100) : 0}% of daily cap</div></div>
+        <div className="metric"><div className="k">Locked remainder</div><div className="v">{fmt8(s.balance)}<small>HYPE</small></div><div className="c">≈ {usd(Number(s.balance) / 1e8 * px)} · {deposited ? Math.round(Number(s.balance) / 1e8 / deposited * 100) : 0}% of deposit</div></div>
+        <div className="metric"><div className="k">Sold to date</div><div className="v">{known ? +soldAll.toFixed(4) : '?'}<small>HYPE</small></div><div className="c">{known && deposited ? Math.round(soldAll / deposited * 100) + '% of deposit' : 'fill history loading'}</div></div>
+        <div className="metric"><div className="k">Gross sale proceeds</div><div className="v">{known ? proceedsN.toFixed(2) : '?'}<small>USDC</small></div><div className="c">{known && soldAll ? 'avg ' + usd(proceedsN / soldAll) + ' / HYPE' : 'no sales yet'}</div></div>
       </div>
       {(stale || fillsErr) && <p className="sub" role="alert">{stale ? 'The testnet RPC did not answer the last refresh; showing the previous read. ' : ''}{fillsErr ? (known ? 'Fill history is unavailable right now; sold and proceeds show the last good read.' : 'Fill history has not loaded yet, so amounts sold are unknown.') : ''}</p>}
     </section>
@@ -109,6 +119,7 @@ function Agreement({ addr }: { addr: Address }) {
               <DialogContent className="sign"><DialogHeader><DialogTitle>Lock more HYPE</DialogTitle><DialogDescription>Sent from your HyperCore spot balance to this contract. It cannot be withdrawn before {dt(Number(s.end))}.</DialogDescription></DialogHeader>
                 <label className="field dep-l">Amount, HYPE<input inputMode="decimal" value={depAmt} onChange={e => setDepAmt(e.target.value)} aria-invalid={!depOk} /></label>
                 {!depOk && <p className="err">Enter an amount above 0, at most 8 decimals.</p>}
+                {depOk && <div className="outcome"><p className="t">What happens</p><ul><li>You send <b className="mono">{depAmt} HYPE</b> (≈ {usd(Number(depAmt) * px)}) from your HyperCore spot balance.</li><li>Locked remainder becomes <b className="mono">{+(Number(s.balance) / 1e8 + Number(depAmt)).toFixed(4)} HYPE</b>.</li><li>At the cap of {cap} HYPE a day it takes at least <b className="mono">{Math.ceil((Number(s.balance) / 1e8 + Number(depAmt)) / cap)} days</b> to sell, never below ${fmt8(s.floor, 2)}.</li><li>You cannot take it back before {dt(Number(s.end))}.</li></ul></div>}
                 <DialogFooter><DialogClose asChild><button className="btn btn-ghost">Go back</button></DialogClose><button className="btn btn-primary" onClick={deposit} disabled={!depOk}>Lock {depAmt} HYPE</button></DialogFooter></DialogContent></Dialog>
             : <button className="btn btn-primary wide" onClick={sellSlice} disabled={!!busy || halted}>{busy === 'Sale' ? 'Submitting sale' : halted ? 'Sales halted under the floor' : "Trigger today's sale"}</button>}
           <p className="muted">{ended ? 'The term is over. Only the team wallet can withdraw what is left.' : before ? <>Selling starts {dt(Number(s.start))}. You can deposit now.</> : used ? (s.balance === 0n ? 'Nothing left to sell. Selling needs a new deposit.' : "Today's allowance is used. Selling resumes at the next reset.") : 'Anyone may trigger it. The caller picks only the size.'}</p>
@@ -121,7 +132,7 @@ function Agreement({ addr }: { addr: Address }) {
         <section className="card" id="c1" aria-labelledby="h-sched">
           <div className="card-h"><div><h2 id="h-sched">Sale schedule</h2><p className="muted">Cumulative HYPE, first days of the term</p></div><span className="chip neutral">Day {dayIdx + 1} of {Math.round((Number(s.end) - Number(s.start)) / 86400)}</span></div>
           {fullySold ? <div className="done-row"><div><b className="mono">{+soldAll.toFixed(4)} / {+deposited.toFixed(4)} HYPE</b><span>All deposited HYPE sold, in {sells.length} fill{sells.length === 1 ? '' : 's'}</span></div><div className="bar"><span style={{ width: '100%' }} /></div></div> : null}
-          {known ? (fullySold ? <details className="more"><summary>Show the schedule chart</summary><Chart start={Number(s.start)} end={Number(s.end)} cap={cap} deposited={deposited} fills={fills} /></details> : <Chart start={Number(s.start)} end={Number(s.end)} cap={cap} deposited={deposited} fills={fills} />) : <figure className="fig1" style={{ margin: 0 }}><p className="muted" role="status">{fillsErr ? 'Fill history has not loaded, so the chart is not drawn. Retrying every 20 seconds.' : 'Loading fill history from HyperCore.'}</p></figure>}
+          {known ? (fullySold ? <details className="more"><summary>Show the schedule chart</summary><Chart start={Number(s.start)} end={Number(s.end)} cap={cap} deposited={deposited} fills={fills} px={Number(s.oracle) / 1e8} /></details> : <Chart start={Number(s.start)} end={Number(s.end)} cap={cap} deposited={deposited} fills={fills} px={Number(s.oracle) / 1e8} />) : <figure className="fig1" style={{ margin: 0 }}><p className="muted" role="status">{fillsErr ? 'Fill history has not loaded, so the chart is not drawn. Retrying every 20 seconds.' : 'Loading fill history from HyperCore.'}</p></figure>}
         </section>
 
         <section className="card" id="c6" aria-labelledby="h-sales">
@@ -203,11 +214,13 @@ function Create() {
   const [f, setF] = useState({ cap: '0.5', floor: '5', start: '', days: '30', band: '2' }); const [out, setOut] = useState(''); const [busy, setBusy] = useState(false); const [open, setOpen] = useState(false);
   const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value }); const capOk = /^\d+(\.\d{1,2})?$/.test(f.cap) && Number(f.cap) > 0 && Number(f.cap) <= 1e6, floorOk = /^\d+(\.\d{1,8})?$/.test(f.floor) && Number(f.floor) > 0 && Number(f.floor) <= 1e9, bandOk = /^\d+(\.\d{1,2})?$/.test(f.band) && Number(f.band) > 0 && Number(f.band) < 100, daysOk = /^\d+$/.test(f.days) && Number(f.days) >= 1 && Number(f.days) <= 3650, valid = capOk && floorOk && bandOk && daysOk;
   const ts = (d: Date) => d.toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }); const startD = f.start ? new Date(f.start) : new Date(); const endD = new Date(startD.getTime() + Number(f.days || 0) * 86400000);
-  const deploy = async () => { setOpen(false); setBusy(true); setOut('');
+  const [mid, setMid] = useState(0); const [tx, setTx] = useState<Tx>({ phase: 'idle' });
+  useEffect(() => { fetch('https://api.hyperliquid-testnet.xyz/info', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ type: 'allMids' }) }).then(r => r.json()).then(m => setMid(Number(m['@1035'] || m.HYPE || 0))).catch(() => {}); }, []);
+  const deploy = async () => { setOpen(false); setBusy(true); setOut(''); setTx({ phase: 'wallet' });
     try { const w = await wallet(); const start = f.start ? BigInt(Math.floor(new Date(f.start).getTime() / 1000)) : 0n; const cap = BigInt(Math.round(Number(f.cap) * 100)) * 1000000n;
-      const h = await w.deployContract({ abi: ABI, bytecode: BYTECODE, args: [11035, 1035, 1105n, cap, BigInt(Math.round(Number(f.floor) * 1e8)), BigInt(Math.round(Number(f.band) * 100)), 100n, start, BigInt(f.days)], chain: w.chain, account: w.account! });
-      const r = await pub.waitForTransactionReceipt({ hash: h }); location.hash = '#/p/' + r.contractAddress; }
-    catch (e) { setOut(revertReason(e)); } setBusy(false); };
+      const h = await w.deployContract({ abi: ABI, bytecode: BYTECODE, args: [11035, 1035, 1105n, cap, BigInt(Math.round(Number(f.floor) * 1e8)), BigInt(Math.round(Number(f.band) * 100)), 100n, start, BigInt(f.days)], chain: w.chain, account: w.account! }); setTx({ phase: 'pending', hash: h });
+      const r = await pub.waitForTransactionReceipt({ hash: h }); setTx({ phase: 'confirmed', hash: h, msg: 'Opening the agreement' }); location.hash = '#/p/' + r.contractAddress; }
+    catch (e) { setOut(revertReason(e)); setTx({ phase: 'failed', msg: 'Nothing was deployed' }); } setBusy(false); };
   return <main className="create">
     <section className="band"><div style={{ display: 'grid', gap: 8 }}><p className="addr">New agreement · HYPE on the HyperCore HYPE/USDC book</p><h1>Pledge your unlock</h1><p className="sub">Set the terms once. After signing nobody can loosen them, you included.</p></div></section>
     <div className="grid">
@@ -228,8 +241,10 @@ function Create() {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><button className="btn btn-primary wide" disabled={busy || !valid}>{busy ? 'Deploying' : 'Review and sign'}</button></DialogTrigger>
           <DialogContent className="sign"><DialogHeader><DialogTitle>Sign this agreement</DialogTitle><DialogDescription>These terms cannot be changed after deployment.</DialogDescription></DialogHeader>
+            <div className="outcome"><p className="t">Simulated outcome at today's oracle (~{usd(mid)} / HYPE)</p><ul><li>Each day at most <b className="mono">{f.cap} HYPE</b> sells, about <b className="mono">{usd(Number(f.cap) * mid)}</b>.</li><li>Over {f.days} days that is at most <b className="mono">{+(Number(f.cap) * Number(f.days)).toFixed(2)} HYPE</b>; any remainder returns to you after the end.</li><li>{mid && Number(f.floor) > mid ? <span className="err">Your floor is above today's price, so nothing would sell right now.</span> : <>Sales halt if the price drops under ${f.floor}.</>}</li></ul></div>
             <ol className="sign-l"><li>Sell at most <b className="mono">{f.cap} HYPE</b> per day.</li><li>Never below <b className="mono">${f.floor}</b>, at most <b className="mono">{f.band}%</b> under the oracle.</li><li>Starts <b className="mono">{ts(startD)}</b>. No cancel, no withdrawal until <b className="mono">{ts(endD)}</b>.</li></ol>
             <DialogFooter><DialogClose asChild><button className="btn btn-ghost">Go back</button></DialogClose><button className="btn btn-primary" onClick={deploy}>Sign and deploy on testnet</button></DialogFooter></DialogContent></Dialog>
+        <TxState t={tx} />
         {!valid && <p className="err">Fix the highlighted terms before signing.</p>}
         <p className="muted" style={{ marginTop: 12 }}>Next: deposit HYPE from your HyperCore spot balance on the agreement page.</p>
       </aside>
