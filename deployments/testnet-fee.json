@@ -1,0 +1,28 @@
+{
+  "chainId": 998,
+  "factory": "0x1897afa39e71c2d9bf3a4ad58fca23072b26bab4",
+  "factoryDeployTx": "0x87b9d749c5d3c9ad68e64b0e4e661600afa81285fc040278d8a0b6a8521eb91e",
+  "factoryBlock": "66636618",
+  "agreement": "0xD90dD9b216965463fe00C0e9FEb3b1cCc2ebCd7A",
+  "createTx": "0xaa7871f271590081e14baef8485d398c8027cbb3f6c963ca792048ecbb8f8402",
+  "createBlock": "66636670",
+  "team": "0x0ad50d9CeB64ec252191e7fC06029B99a3b975AF",
+  "feeRecipient": "0xBBddd45458F99FA46bE10DC31f30533DA7360Aa9",
+  "feeBps": 25,
+  "factoryFeeRecipient": "0xBBddd45458F99FA46bE10DC31f30533DA7360Aa9",
+  "factoryFeeBps": 25,
+  "isAgreement": true,
+  "params": {
+    "asset": 11035,
+    "spotIndex": 1035,
+    "token": 1105,
+    "capPerDay": "0.25 HYPE",
+    "floor": "$5.00",
+    "bandBps": 200,
+    "days": 30
+  },
+  "gasUsed": {
+    "factory": "1847092",
+    "create": "1299438"
+  }
+}
