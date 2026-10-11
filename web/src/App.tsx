@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 type Fill = { coin: string; px: string; sz: string; side: string; time: number; hash: string };
 const route = () => { const h = location.hash.replace(/^#\/?/, ''); if (h.startsWith('create')) return { page: 'create' as const }; if (h.startsWith('judges')) return { page: 'judges' as const, addr: DEMO as Address }; if (h.startsWith('business')) return { page: 'business' as const, addr: DEMO as Address }; const m = h.match(/^p\/(0x[0-9a-fA-F]{40})/); return { page: 'pledge' as const, addr: (m ? m[1] : DEMO) as Address }; };
 const dt = (s: number) => new Date(s * 1000).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
-const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+const go = (id: string) => { const el = document.getElementById(id); if (!el) return; el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true }); el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); };
 const Addr = ({ a, kind = 'address' }: { a: string; kind?: 'address' | 'tx' }) => <a className="link mono" href={`${EXPLORER}/${kind}/${a}`} target="_blank" rel="noreferrer" title={a}>{short(a)}</a>;
 
 export default function App() {
@@ -28,7 +28,7 @@ export default function App() {
 
 function Chart({ start, end, cap, deposited, fills }: { start: number; end: number; cap: number; deposited: number; fills: Fill[] }) {
   const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440); useEffect(() => { const o = () => setVw(window.innerWidth); addEventListener('resize', o); return () => removeEventListener('resize', o); }, []);
-  const narrow = vw < 600, days = Math.max(1, Math.round((end - start) / 86400)), W = narrow ? 340 : 720, H = narrow ? 200 : 220, L = 44, B = 28, T = 16, R = 16;
+  const narrow = vw < 600, fs = narrow ? 13 : 12, days = Math.max(1, Math.round((end - start) / 86400)), W = narrow ? 340 : 720, H = narrow ? 200 : 220, L = 44, B = 28, T = 16, R = 16;
   const elapsed = Math.max(0, (Date.now() / 1000 - start) / 86400), shown = Math.min(days, Math.max(3, Math.ceil(elapsed) + 2));
   const max = Math.max(deposited, cap, 0.0001) * 1.25; const x = (d: number) => L + (d / shown) * (W - L - R), y = (v: number) => T + (1 - Math.min(v, max) / max) * (H - T - B);
   const lim = (v: number) => Math.min(v, deposited); let allow = `M${x(0)},${y(0)}`; for (let d = 0; d < shown; d++) allow += ` V${y(lim(cap * (d + 1)))} H${x(d + 1)}`;
@@ -37,10 +37,10 @@ function Chart({ start, end, cap, deposited, fills }: { start: number; end: numb
   const ticks = [0, lim(cap * shown) / 2, lim(cap * shown)];
   return <figure className="fig1 chart" style={{ margin: 0 }}>
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Ceiling ${+lim(cap * shown).toFixed(4)} HYPE; ${+cum.toFixed(4)} HYPE filled`}>
-      {ticks.map(v => <g key={v}><line x1={L} x2={W - R} y1={y(v)} y2={y(v)} className="grid-l" /><text x={L - 8} y={y(v) + 4} className="ax" textAnchor="end">{+v.toFixed(2)}</text></g>)}
-      {Array.from({ length: shown + 1 }, (_, d) => d).filter(d => !narrow || d % 2 === 0 || d === shown).map(d => <text key={d} x={x(d)} y={H - 6} className="ax" textAnchor={d === shown ? 'end' : d === 0 ? 'start' : 'middle'}>{d === 0 ? 'start' : 'day ' + d}</text>)}
+      {ticks.map(v => <g key={v}><line x1={L} x2={W - R} y1={y(v)} y2={y(v)} className="grid-l" /><text x={L - 8} y={y(v) + 4} className="ax" fontSize={fs} textAnchor="end">{+v.toFixed(2)}</text></g>)}
+      {Array.from({ length: shown + 1 }, (_, d) => d).filter(d => !narrow || d % 2 === 0 || d === shown).map(d => <text key={d} x={x(d)} y={H - 6} className="ax" fontSize={fs} textAnchor={d === shown ? 'end' : d === 0 ? 'start' : 'middle'}>{d === 0 ? 'start' : 'day ' + d}</text>)}
       <path d={allow} className="allow" /><path d={sold} className="sold" />
-      <line x1={x(today)} x2={x(today)} y1={T} y2={H - B} className="now" /><text x={x(today) + 6} y={T + 12} className="ax">now</text>
+      <line x1={x(today)} x2={x(today)} y1={T} y2={H - B} className="now" /><text x={x(today) + 6} y={T + 12} className="ax" fontSize={fs}>now</text>
       {dots.map((p, i) => <g key={i}><circle cx={x(p.d)} cy={y(p.cum)} r="6" className="dot" />{i === dots.length - 1 && <text x={x(p.d) > W * 0.4 ? x(p.d) - 12 : x(p.d) + 12} textAnchor={x(p.d) > W * 0.4 ? 'end' : 'start'} y={y(p.cum) + 22} className="lbl" dy={-30}>{p.cum >= deposited - 1e-9 ? `all ${+p.cum.toFixed(4)} HYPE sold` : `${+p.cum.toFixed(4)} HYPE filled`}</text>}</g>)}
     </svg>
     <figcaption className="legend"><span><i style={{ background: '#3F7A1F' }} />Ceiling: most that may have sold</span><span><i style={{ background: '#0E0F0C' }} />Filled on HyperCore</span><span><i style={{ background: '#9FE870', height: 8, width: 8, borderRadius: 4 }} />Real fill</span></figcaption>
@@ -76,7 +76,9 @@ function Agreement({ addr }: { addr: Address }) {
     const hl = await import('@nktkas/hyperliquid'); const w = await wallet(); const ex = new hl.ExchangeClient({ wallet: w as any, transport: new hl.HttpTransport({ isTestnet: true }) });
     const before = s.balance; await ex.spotSend({ destination: addr, token: 'HYPE:0x7317beb7cceed72ef0b346074cc8e7ab', amount: amt }); for (let i = 0; i < 10; i++) { await new Promise(r => setTimeout(r, 2000)); const st = await readState(addr).catch(() => null); if (st && st.balance > before) { const inc = Number(st.balance - before) / 1e8; return Math.abs(inc - Number(amt)) < 1e-8 ? `${amt} HYPE locked on HyperCore; contract balance is now ${fmt8(st.balance)} HYPE` : `Sent ${amt} HYPE; the contract balance changed by ${+inc.toFixed(8)} HYPE to ${fmt8(st.balance)} HYPE`; } } return `${amt} HYPE sent; the contract balance has not updated yet, refresh in a minute`; });
   const used = s.remaining === 0n || s.balance === 0n; const depOk = /^\d+(\.\d{1,8})?$/.test(depAmt) && Number(depAmt) > 0 && Number(depAmt) <= 1e6;
-  const avail = s.remaining < s.balance ? s.remaining : s.balance; const pct = cap > 0 ? Math.min(100, Number(s.sold) / 1e8 / cap * 100) : 0;
+  const nowS = Date.now() / 1000, before = nowS < Number(s.start), ended = nowS >= Number(s.end);
+  const release = () => act('Withdraw', async () => { const w = await wallet(); const h = await w.writeContract({ address: addr, abi: ABI, functionName: 'release', args: [1105n, s.balance], chain: w.chain, account: w.account! }); const rc = await pub.waitForTransactionReceipt({ hash: h }); if (rc.status !== 'success') throw new Error(`withdraw reverted, tx ${short(h)}`); return `Remainder withdrawn to the team, tx ${short(h)}`; });
+  const avail = before || ended ? 0n : s.remaining < s.balance ? s.remaining : s.balance; const fullySold = s.balance === 0n && known && soldAll > 0; const pct = cap > 0 ? Math.min(100, Number(s.sold) / 1e8 / cap * 100) : 0;
   return <main>
     <section className="band" aria-label="Summary">
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -85,7 +87,7 @@ function Agreement({ addr }: { addr: Address }) {
           <h1>{known ? +deposited.toFixed(4) : `≥ ${+deposited.toFixed(4)}`} HYPE pledged, sold on a schedule</h1>
           <p className="sub">At most {cap} HYPE a day on the HyperCore book, never below ${fmt8(s.floor, 2)}. Nobody can cancel it, the team included.</p>
         </div>
-        <div className="chips">{halted ? <span className="chip bad">Halted: under floor</span> : s.balance === 0n ? (known && soldAll > 0 ? <span className="chip ok">Fully sold</span> : <span className="chip warn">Awaiting deposit</span>) : <span className="chip ok">Active</span>}<span className="chip dark">Not cancelable</span><span className="chip dark">Testnet</span></div>
+        <div className="chips">{fullySold ? <span className="chip ok">Fully sold</span> : ended ? <span className="chip neutral">Term ended</span> : before ? <span className="chip warn">Scheduled</span> : s.balance === 0n ? <span className="chip warn">Awaiting deposit</span> : halted ? <span className="chip bad">Halted: under floor</span> : <span className="chip ok">Active</span>}<span className="chip dark">Not cancelable</span><span className="chip dark">Testnet</span></div>
       </div>
       <div className="metrics now-line" role="status">
         <div className="metric"><div className="k">Available to sell now</div><div className="v avail-v">{fmt8(avail)} HYPE</div></div>
@@ -97,15 +99,34 @@ function Agreement({ addr }: { addr: Address }) {
     </section>
 
     <div className="grid">
+      <aside className="panel card" id="status" aria-label="Actions">
+        <div className="card-h"><h2>{ended ? 'Term ended' : before ? 'Not started' : 'Today'}</h2>{!ended && !before && <span className="chip neutral">Resets in <Countdown to={nextDay} /></span>}</div>
+        <div id="c2"><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 6 }}><span>Counted toward the current window</span><span className="mono">{fmt8(s.sold)} / {cap} HYPE</span></div><div className="bar" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Share of today's cap sold"><span style={{ width: pct + '%' }} /></div></div>
+        <p className="muted" style={{ marginTop: 6 }}>The counter resets on the first call after 24 hours.</p><dl className="kv"><div><dt>Left in window</dt><dd>{fmt8(s.remaining)} HYPE</dd></div><div><dt>Awaiting fill</dt><dd>{fmt8(s.pending)} HYPE</dd></div><div><dt>Order limit</dt><dd>${fmt8(s.limit, 3)}</dd></div><div><dt>Floor</dt><dd>${fmt8(s.floor, 2)}</dd></div></dl>
+        {todays.length > 0 && <ul className="log" aria-label="Today's fills">{todays.map(f => <li key={f.hash}>Filled {f.sz} HYPE @ {f.px} · {new Date(f.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</li>)}</ul>}
+        <div style={{ display: 'grid', gap: 8, marginTop: 16 }}>
+          {ended ? <button className="btn btn-primary wide" onClick={release} disabled={!!busy || s.balance === 0n}>{busy === 'Withdraw' ? 'Withdrawing' : s.balance === 0n ? 'Nothing left to withdraw' : 'Withdraw remainder (team)'}</button> : (used || before) ? <Dialog open={depOpen} onOpenChange={setDepOpen}><DialogTrigger asChild><button className="btn btn-primary wide" disabled={!!busy}>{busy === 'Deposit' ? 'Depositing' : 'Deposit HYPE'}</button></DialogTrigger>
+              <DialogContent className="sign"><DialogHeader><DialogTitle>Lock more HYPE</DialogTitle><DialogDescription>Sent from your HyperCore spot balance to this contract. It cannot be withdrawn before {dt(Number(s.end))}.</DialogDescription></DialogHeader>
+                <label className="field dep-l">Amount, HYPE<input inputMode="decimal" value={depAmt} onChange={e => setDepAmt(e.target.value)} aria-invalid={!depOk} /></label>
+                {!depOk && <p className="err">Enter an amount above 0, at most 8 decimals.</p>}
+                <DialogFooter><DialogClose asChild><button className="btn btn-ghost">Go back</button></DialogClose><button className="btn btn-primary" onClick={deposit} disabled={!depOk}>Lock {depAmt} HYPE</button></DialogFooter></DialogContent></Dialog>
+            : <button className="btn btn-primary wide" onClick={sellSlice} disabled={!!busy}>{busy === 'Sale' ? 'Submitting sale' : "Trigger today's sale"}</button>}
+          <p className="muted">{ended ? 'The term is over. Only the team wallet can withdraw what is left.' : before ? <>Selling starts {dt(Number(s.start))}. You can deposit now.</> : used ? (s.balance === 0n ? 'Nothing left to sell. Selling needs a new deposit.' : "Today's allowance is used. Selling resumes at the next reset.") : 'Anyone may trigger it. The caller picks only the size.'}</p>
+          <button className="btn btn-ghost" onClick={reconcile} disabled={!!busy}>{busy === 'Reconcile' ? 'Reconciling' : 'Reconcile fills'}</button>
+        </div>
+        {log.length > 0 && <ul className="log" aria-live="polite">{log.map((l, i) => <li key={i}>{l}</li>)}</ul>}
+        <nav className="secnav" aria-label="Sections"><p className="muted">Jump to</p><div>{[['c1', 'Schedule'], ['c6', 'Sales'], ['c3', 'Price'], ['c4', 'Break it']].map(([id, t]) => <button key={id} className="navpill" onClick={() => go(id)}>{t}</button>)}</div></nav>
+      </aside>
       <div className="stack">
         <section className="card" id="c1" aria-labelledby="h-sched">
           <div className="card-h"><div><h2 id="h-sched">Sale schedule</h2><p className="muted">Cumulative HYPE, first days of the term</p></div><span className="chip neutral">Day {dayIdx + 1} of {Math.round((Number(s.end) - Number(s.start)) / 86400)}</span></div>
-          {known ? <Chart start={Number(s.start)} end={Number(s.end)} cap={cap} deposited={deposited} fills={fills} /> : <figure className="fig1" style={{ margin: 0 }}><p className="muted" role="status">{fillsErr ? 'Fill history has not loaded, so the chart is not drawn. Retrying every 20 seconds.' : 'Loading fill history from HyperCore.'}</p></figure>}
+          {fullySold ? <div className="done-row"><div><b className="mono">{+soldAll.toFixed(4)} / {+deposited.toFixed(4)} HYPE</b><span>All deposited HYPE sold, in {sells.length} fill{sells.length === 1 ? '' : 's'}</span></div><div className="bar"><span style={{ width: '100%' }} /></div></div> : null}
+          {known ? (fullySold ? <details className="more"><summary>Show the schedule chart</summary><Chart start={Number(s.start)} end={Number(s.end)} cap={cap} deposited={deposited} fills={fills} /></details> : <Chart start={Number(s.start)} end={Number(s.end)} cap={cap} deposited={deposited} fills={fills} />) : <figure className="fig1" style={{ margin: 0 }}><p className="muted" role="status">{fillsErr ? 'Fill history has not loaded, so the chart is not drawn. Retrying every 20 seconds.' : 'Loading fill history from HyperCore.'}</p></figure>}
         </section>
 
         <section className="card" id="c6" aria-labelledby="h-sales">
-          <div className="card-h"><h2 id="h-sales">Sales on HyperCore</h2><span className="chip ok">Real fills</span></div>
-          {fills.length === 0 ? <p className="muted">{fillsErr ? 'No fill history available right now.' : 'No fills yet. The first sale appears here seconds after it fills.'}</p> :
+          <div className="card-h"><h2 id="h-sales">Sales on HyperCore</h2>{fillsErr ? <span className="chip warn">History unavailable</span> : <span className="chip ok">Real fills</span>}</div>
+          {fills.length === 0 ? <p className="muted" role="status">{fillsErr ? 'Fill history could not be loaded. Retrying every 20 seconds.' : !fillsLoaded ? 'Loading fill history from HyperCore.' : 'No fills yet. The first sale appears here seconds after it fills.'}</p> :
             <><ul className="fill-list show-sm" aria-label="Sales">{fills.map(f => <li key={f.hash + f.time}><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span className={'chip ' + (f.side === 'A' ? 'ok' : 'neutral')}>{f.side === 'A' ? 'Sell' : 'Buy'}</span><b className="mono">{f.sz} HYPE</b><span className="muted">@ {f.px} USDC</span></div><div className="muted mono">{new Date(f.time).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} · <a className="link" href={`https://app.hyperliquid-testnet.xyz/explorer/tx/${f.hash}`} target="_blank" rel="noreferrer">{short(f.hash)}</a></div></li>)}</ul><Table className="dtable ledger hide-sm"><TableHeader><TableRow><TableHead>Time</TableHead><TableHead className="hide-sm">Side</TableHead><TableHead className="num">Size HYPE</TableHead><TableHead className="num">Price USDC</TableHead><TableHead className="hide-sm">Hash</TableHead></TableRow></TableHeader>
               <TableBody>{fills.map(f => <TableRow key={f.hash + f.time}><TableCell className="mono">{new Date(f.time).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</TableCell><TableCell className="hide-sm"><span className={'chip ' + (f.side === 'A' ? 'ok' : 'neutral')}>{f.side === 'A' ? 'Sell' : 'Buy'}</span></TableCell><TableCell className="num">{f.sz}</TableCell><TableCell className="num">{f.px}</TableCell><TableCell className="hide-sm"><a className="link mono" href={`https://app.hyperliquid-testnet.xyz/explorer/tx/${f.hash}`} target="_blank" rel="noreferrer">{short(f.hash)}</a></TableCell></TableRow>)}</TableBody></Table></>}
           <details className="more" style={{ marginTop: 12 }}><summary>Fork-simulated checks <span className="chip warn" style={{ marginLeft: 8 }}>fork-simulated</span></summary>
@@ -124,7 +145,7 @@ function Agreement({ addr }: { addr: Address }) {
           <p className="muted" style={{ marginBottom: 12 }}>Each check simulates the call against the live contract. No wallet, no gas.</p>
           <div className="checks">{TRIES.map(t => { const r = tries[t.label]; return <div className="check" key={t.label}>
             <div><p className="t">{t.label}</p><p className="r">{t.rule}{t.tx && <> Already reverted on-chain: <Addr a={t.tx} kind="tx" />.</>}</p></div>
-            {r ? <div className="verdict" role="status"><span className={'chip ' + (r.ok ? 'warn' : r.reverted ? 'bad' : 'neutral')}>{r.ok ? 'Allowed' : r.reverted ? 'Rejected by the contract' : 'Could not check (network)'}</span><span className="mono">"{r.reason}" · {r.at}</span></div>
+            {r ? <div className="verdict" role="status"><span className={'chip ' + (r.ok ? 'warn' : r.reverted ? 'bad' : 'neutral')}>{r.ok ? 'Allowed' : r.reverted ? 'Rejected by the contract' : 'Could not check (network)'}</span><span className="mono">"{r.reason}" · {r.at}</span>{!r.ok && !r.reverted && <button className="btn btn-secondary" onClick={() => run(t)} disabled={running === t.label}>Retry check</button>}</div>
               : <button className="btn btn-secondary" onClick={() => run(t)} disabled={running === t.label} aria-busy={running === t.label}>{running === t.label ? 'Simulating' : t.btn}</button>}
           </div>; })}</div>
         </section>
@@ -136,24 +157,6 @@ function Agreement({ addr }: { addr: Address }) {
         </section>
               </div>
 
-      <aside className="panel card" id="status" aria-label="Actions">
-        <div className="card-h"><h2>Today</h2><span className="chip neutral">Resets in <Countdown to={nextDay} /></span></div>
-        <div id="c2"><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 6 }}><span>Counted toward the current window</span><span className="mono">{fmt8(s.sold)} / {cap} HYPE</span></div><div className="bar" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Share of today's cap sold"><span style={{ width: pct + '%' }} /></div></div>
-        <p className="muted" style={{ marginTop: 6 }}>The counter resets on the first call after 24 hours.</p><dl className="kv"><div><dt>Left in window</dt><dd>{fmt8(s.remaining)} HYPE</dd></div><div><dt>Awaiting fill</dt><dd>{fmt8(s.pending)} HYPE</dd></div><div><dt>Order limit</dt><dd>${fmt8(s.limit, 3)}</dd></div><div><dt>Floor</dt><dd>${fmt8(s.floor, 2)}</dd></div></dl>
-        {todays.length > 0 && <ul className="log" aria-label="Today's fills">{todays.map(f => <li key={f.hash}>Filled {f.sz} HYPE @ {f.px} · {new Date(f.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</li>)}</ul>}
-        <div style={{ display: 'grid', gap: 8, marginTop: 16 }}>
-          {used ? <Dialog open={depOpen} onOpenChange={setDepOpen}><DialogTrigger asChild><button className="btn btn-primary wide" disabled={!!busy}>{busy === 'Deposit' ? 'Depositing' : 'Deposit HYPE'}</button></DialogTrigger>
-              <DialogContent className="sign"><DialogHeader><DialogTitle>Lock more HYPE</DialogTitle><DialogDescription>Sent from your HyperCore spot balance to this contract. It cannot be withdrawn before {dt(Number(s.end))}.</DialogDescription></DialogHeader>
-                <label className="field dep-l">Amount, HYPE<input inputMode="decimal" value={depAmt} onChange={e => setDepAmt(e.target.value)} aria-invalid={!depOk} /></label>
-                {!depOk && <p className="err">Enter an amount above 0, at most 8 decimals.</p>}
-                <DialogFooter><DialogClose asChild><button className="btn btn-ghost">Go back</button></DialogClose><button className="btn btn-primary" onClick={deposit} disabled={!depOk}>Lock {depAmt} HYPE</button></DialogFooter></DialogContent></Dialog>
-            : <button className="btn btn-primary wide" onClick={sellSlice} disabled={!!busy}>{busy === 'Sale' ? 'Submitting sale' : "Trigger today's sale"}</button>}
-          <p className="muted">{used ? (s.balance === 0n ? 'Nothing left to sell. Selling needs a new deposit.' : "Today's allowance is used. Selling resumes at the next reset.") : 'Anyone may trigger it. The caller picks only the size.'}</p>
-          <button className="btn btn-ghost" onClick={reconcile} disabled={!!busy}>{busy === 'Reconcile' ? 'Reconciling' : 'Reconcile fills'}</button>
-        </div>
-        {log.length > 0 && <ul className="log" aria-live="polite">{log.map((l, i) => <li key={i}>{l}</li>)}</ul>}
-        <nav className="secnav" aria-label="Sections"><p className="muted">Jump to</p><div>{[['c1', 'Schedule'], ['c6', 'Sales'], ['c3', 'Price'], ['c4', 'Break it']].map(([id, t]) => <button key={id} className="navpill" onClick={() => go(id)}>{t}</button>)}</div></nav>
-      </aside>
     </div>
   </main>;
 }
