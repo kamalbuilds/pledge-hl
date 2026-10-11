@@ -1,0 +1,14 @@
+ok   webfont loaded
+ok   primary font: DMMono
+ok   tables: 11, none bare
+ok   no Markdown rendering
+ok   links styled
+ok   CSS variables defined (6 decls)
+ok   button styles present
+ok   status chips/badges styled (8)
+FAIL no surfaces (card/panel class + shadow/surface token): flat document
+ok   summary metrics present
+ok   radius ok
+---
+slop-check: 1 issue(s)
+EXIT 1

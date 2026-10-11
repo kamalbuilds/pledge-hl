@@ -1,0 +1,16 @@
+ok   webfont loaded
+FAIL primary font '-apple-system' is on the banned list with no display face (font-family:var(--font-sans))
+ok   tables: 0, none bare
+ok   no Markdown rendering
+ok   links styled
+ok   CSS variables defined (1 decls)
+ok   button styles present
+ok   status chips/badges styled (2)
+FAIL no surfaces (card/panel class + shadow/surface token): flat document
+ok   summary metrics present
+ok   radius mixed (1 zero, 2 non-zero)
+rendered: face=Manrope rounded=1 square=10 panels=0 status_plain=0 status_chip=0
+FAIL rendered: no panels/cards (no surface differs from page background, no shadows)
+---
+slop-check: 3 issue(s)
+EXIT 1
