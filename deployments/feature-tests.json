@@ -1,0 +1,68 @@
+[
+ {
+  "step": "deploy not-started (start +1 day)",
+  "tx": "0x8a21e084e94691d420db67a91c7a3582ae696de8a2f0815b1247daf6d8a693ce",
+  "address": "0x7df0f2d11c4c9feb175c7dc59feef8e211ccd5a8"
+ },
+ {
+  "step": "sell before start",
+  "tx": "0x2e19682be27bef21e898dbb31ff32ee88461eb255d2b01a32732eaed42dc073d",
+  "status": "reverted",
+  "reason": "not started"
+ },
+ {
+  "step": "deploy floor $1000",
+  "tx": "0xeafb44598ac4366f5ba0bc2d604228b9a8fc32442d70194070ca28010f017319",
+  "address": "0x889f862266e6bcafbc6a91556a328a42eb795025"
+ },
+ {
+  "step": "sell under floor",
+  "tx": "0xb06a04b6743f802377598dd40e3c9a1cdda210c484ce7bd0c4146b5ad9350c67",
+  "status": "reverted",
+  "reason": "below floor"
+ },
+ {
+  "t": "2026-10-11T04:44:43.236Z",
+  "step": "deploy term 0 days (ends immediately)",
+  "tx": "0x158cb63c7e158610ce43e7be53afb2dd7bec4c1a4556855b2d1212b4b19937c1",
+  "address": "0x03293d053ac9d4a3a892c8a2d1288d3c203f7dd0"
+ },
+ {
+  "t": "2026-10-11T04:44:44.157Z",
+  "step": "deposit 0.05 HYPE",
+  "r": {
+   "status": "ok",
+   "response": {
+    "type": "default"
+   }
+  }
+ },
+ {
+  "t": "2026-10-11T04:45:08.569Z",
+  "step": "contract balance after deposit (sz8 wei)",
+  "bal": "5000000"
+ },
+ {
+  "t": "2026-10-11T04:45:11.791Z",
+  "step": "team release #1 (mislabeled in the run as non-team; caller was the team)",
+  "fn": "release",
+  "tx": "0xc88b31071268f09d9262e7870460ef96f9fc4ebe4a6bfc69a380a999e2bff417",
+  "status": "success",
+  "reason": ""
+ },
+ {
+  "t": "2026-10-11T04:45:13.386Z",
+  "step": "team release after end",
+  "fn": "release",
+  "tx": "0x3db895d714be322e7272d69f0124c5c9d4faadd368f2545ab1bb5dab5def9380",
+  "status": "success",
+  "reason": ""
+ },
+ {
+  "t": "2026-10-11T04:45:20.033Z",
+  "step": "team HYPE on Core before/after release",
+  "before": "0.0",
+  "after": "0.05",
+  "contractAfter": "0"
+ }
+]

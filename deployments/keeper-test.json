@@ -1,0 +1,20 @@
+{
+ "pledge": "0x13c156409c57076550077313970ec125bca59f80",
+ "team": "0xBBddd45458F99FA46bE10DC31f30533DA7360Aa9",
+ "caller": "0x0ad50d9CeB64ec252191e7fC06029B99a3b975AF",
+ "before": {
+  "balance": "25000000",
+  "soldToday": "0"
+ },
+ "sellTx": "0x2e546b3da788f89967a6e71ca52b35ed4d73133dff8138634aa9b64451a59e8f",
+ "sellStatus": "success",
+ "reconcileTx": "0xdb6b6fabf2107f0282c0e26b1e9988850ce6022fb0df89ff4c6f2aa5b4b50754",
+ "reconcileStatus": "success",
+ "after": {
+  "balance": "0",
+  "soldToday": "25000000",
+  "pending": "0",
+  "remainingToday": "0"
+ },
+ "note": "A non-team address triggered sell() at the contract-set price. The 0.25 HYPE IOC (about 5.63 USDC) FILLED on HyperCore at 22.51 (fill hash 0xe150a5bd...bbb4): orders sent through CoreWriter were not held to a 10 USDC minimum here. reconcile counted 0.25 against the cap."
+}

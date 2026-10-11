@@ -1,41 +1,92 @@
-# PLEDGE: irrevocable slow-sell for unlocked supply on Hyperliquid
+# PLEDGE
 
-A token team locks unlocked supply in a HyperEVM contract. The contract can only sell it on the HyperCore spot book: at most
-`capPerDay` of **filled** size per day, at an IOC limit the contract computes (oracle from precompile 0x808, minus a max band),
-and never below `floorPx8`. There is no cancel path and no early withdraw. "We won't dump" becomes something the chain enforces.
+**A token team's "we won't dump" promise, enforced by a contract on Hyperliquid.**
 
-Track: Colosseum World's Fair, Hyperliquid. Network: HyperEVM testnet (998) + HyperCore testnet.
+A team locks unlocked supply in a HyperEVM contract. The contract can only sell it on the HyperCore spot book: at most a fixed amount of *filled* size per day, at an order price the contract computes from the oracle, and never below a floor price. Nobody can cancel the agreement or withdraw early, the team included. Anyone can trigger the daily sale.
 
-## Layout
-- `contracts/`: Foundry. `src/Pledge.sol`, with `test/Pledge.t.sol` (16 unit tests, mocked precompiles) and `test/PledgeFork.t.sol` (4 fork tests).
-- `web/`: Vite + React + viem. Pages: create a pledge (`#/create`), and a public pledge page (`#/p/<address>`) showing locked supply,
-  sold today vs cap (hourglass), the price guard, the sell history, and "Try to break it" (live eth_call: cancel, early release, 2× cap, dust lot -> rejected).
-- `scripts/deploy.mjs`: testnet deploy plus three on-chain rejected attempts. `scripts/real-sale.mjs`: the funded real sale (preflight; `--go`).
-- `deployments/`: testnet addresses, tx log, fork-sim output.
+- Live app (Hyperliquid testnet): https://pledge-ccs.pages.dev
+- Network: HyperEVM testnet (chain 998) and HyperCore testnet
+- Demo agreement: [`0x1cf99b8af3745deef01cc1c29708e10d4538e50e`](https://testnet.purrsec.com/address/0x1cf99b8af3745deef01cc1c29708e10d4538e50e)
 
-## Run
+## Why
+Unlocks move a lot of supply. Tokenomist counts $97.43B of tokens unlocked in 2025, $18.77B of that to insiders (team and investors), and about $496M of HYPE ([source](https://www.tokenomist.ai/research/2025-token-unlocks-review-a-complete-breakdown-of-emissions-insider-vesting-and-market-impact)). Today a team's selling plan is a blog post or a private market maker contract. PLEDGE makes the plan public and impossible to break.
+
+## How it works
 ```
-cd contracts && forge test --no-match-contract PledgeFork          # unit
-FORK_BLOCK=<recent> PLEDGE=<addr> LIVE_PX=<0x808 value> forge test --match-contract PledgeFork -vv   # fork-sim
-cd web && npm i && npm run dev
+ team wallet ──spotSend HYPE──▶  Pledge contract's HyperCore spot balance
+                                     │
+ anyone ──sell(size)──▶ Pledge.sol (HyperEVM)
+                         │ checks: started? size within today's allowance? oracle limit >= floor? balance?
+                         │ price = oracle (precompile 0x808) minus maxDevBps, rounded to Core tick rules
+                         └─ CoreWriter (0x3333…3333) ──IOC sell──▶ HyperCore HYPE/USDC book
+ anyone ──reconcile()──▶ reads its own Core balance (precompile 0x801); the drop is the filled size.
+                         Filled size counts against the day; unfilled size goes back to the allowance.
+ team ──release()──▶ only after the end date: CoreWriter spotSend of the remainder and USDC proceeds to the team
+ cancel() ──▶ always reverts. There is no owner, no admin, no upgrade, no early withdraw.
 ```
+Key design choices:
+- **The caller picks only the size, never the price.** A v1 let the caller set the price, so a griefer could post a never-fill order and burn the day. v2 computes the limit itself.
+- **The cap counts fills, not orders.** HyperCore actions settle after the EVM block, so the contract measures its own balance drop on the next call. An IOC that does not fill refunds its size.
+- **One pending order at a time**, so fills can always be attributed.
 
-## Real vs simulated
-| What | Status |
-|---|---|
-| Demo pledge `0x1cf99b8af3745deef01cc1c29708e10d4538e50e` (deploy tx `0x1a666b8f…79e7`) | REAL testnet |
-| Live oracle and limit read via 0x808 (22.512 -> 22.061) | REAL testnet |
-| Rejected on-chain: 2× cap sell `0x605126b8…807f`, cancel `0x6c32d949…5c8c`, early release `0x2ff82664…d5d8` | REAL testnet |
-| Funded sale: full fill, never-fill refund, partial fill + next day, oracle crash below floor | FORK-SIMULATED (forge fork of 998, HyperCore mocked). Tenderly has no HyperEVM network |
-| Real funded sale (Oct 10): 0.5 HYPE locked, sell() tx `0x6d90c024…8430` filled 0.5 @ 22.512 on HyperCore (fill hash `0xf1b569a4…2a26`); reconcile() tx `0x61c9f769…5f03` emitted Filled(0.5, refund 0), soldToday = 0.5 = cap; the next sell() reverted on-chain `0x62eb3c43…62f1`. 11.248 USDC proceeds sit in the contract | REAL testnet |
-| Real unfilled IOC refunded the cap: sells `0xe3faafd9…c236` and `0xcf296da8…4a49` got no fill (no bids above the limit); reconcile `0x896adaa0…8a49` -> Filled(0, refund 0.5) | REAL testnet |
+## Features: what is real and what is simulated
+| Feature | Status | Evidence |
+|---|---|---|
+| Create an agreement from the web app with a browser wallet | Real, testnet | Playwright + injected test wallet, create tx `0x1327f211…3d57`, agreement `0x9af101c5…91a5` (`e2e/wallet-flow.mjs`, `e2e/results/`) |
+| Deposit HYPE from HyperCore into the agreement | Real, testnet | Same run: signed spotSend of 0.5 HYPE, balance read back from 0x801 |
+| Sale as a contract-priced IOC on the HyperCore book | Real, testnet | Sale tx `0x5f9fb781…1913` filled 0.5 HYPE @ 22.538; demo sale `0x6d90c024…8430` filled 0.5 @ 22.512 |
+| Anyone, not only the team, can trigger the sale | Real, testnet | Non-team caller sold 0.25 HYPE @ 22.51 on agreement `0x13c15640…9f80`, tx `0x2e546b3d…9e8f` (`deployments/keeper-test.json`) |
+| Daily cap counts filled size; a second sale the same day reverts | Real, testnet | reconcile `0x61c9f769…5f03` (soldToday = cap), next sell reverted `0x62eb3c43…62f1` |
+| Unfilled order refunds the allowance | Real, testnet | sells `0xe3faafd9…c236`, `0xcf296da8…4a49` got no fill; reconcile `0x896adaa0…8a49` emitted Filled(0, refund 0.5) |
+| Sale blocked below the floor price | Real, testnet | Floor $1000 agreement `0x889f8622…5025`, sell reverted "below floor" `0xb06a04b6…0c67` |
+| Sale blocked before the start date | Real, testnet | Agreement `0x7df0f2d1…d5a8`, sell reverted "not started" `0x2e19682b…073d` |
+| Cancel and early withdrawal always revert | Real, testnet | cancel `0x6c32d949…5c8c`, early release `0x2ff82664…d5d8`; live checks from the page |
+| Team withdraws the remainder after the end date | Real, testnet | 0-day agreement `0x03293d05…7dd0`: 0.05 HYPE deposited, release `0x3db895d7…9380` returned it to the team (`deployments/feature-tests.json`) |
+| Only the team can release | Unit test | `test_nonTeamCannotRelease` |
+| Allowance resets across days; partial fill then next day; oracle crash mid-term | Fork-simulated | `contracts/test/PledgeFork.t.sol` on a fork of chain 998 with HyperCore mocked (Annex A on the site) |
+| Record of sales read live from HyperCore fills | Real, testnet | Clause 6 on the site, `userFills` API |
+| 0.25% protocol fee on proceeds | Planned, not in the contract | Business model below |
+| Mainnet, tokens other than HYPE | Planned | |
 
-## Built before vs during the event
-- Before the build sprint (Oct 10 spike): Pledge v1 (cap + floor, caller-set price), 5 tests, v1 testnet deploy.
-- During (Oct 10): v2 griefing fix (contract-set oracle-band price, filled-size cap via 0x801 balance delta), start time, `cancel()` proof,
-  16 unit + 4 fork tests, testnet redeploy, web app, scripts, this README.
+Full tx hashes are in `deployments/` (`testnet.json`, `real-sale*.json`, `funding.jsonl`, `feature-tests.json`, `keeper-test.json`) and in `e2e/results/`.
+
+## For judges (about 60 seconds)
+1. Open https://pledge-ccs.pages.dev. Everything shown is read live from testnet.
+2. In clause 4 press the three "Simulate" buttons. Each one calls the live contract and comes back "Rejected by the contract".
+3. Check the fills yourself:
+   `curl -s -X POST https://api.hyperliquid-testnet.xyz/info -H 'content-type: application/json' -d '{"type":"userFills","user":"0x9af101c5d73432510e037dc8b05ec35811de91a5"}'`
+4. Open any tx above on https://testnet.purrsec.com.
+
+## Business model
+- **Who pays:** the token team or foundation that locks supply. They get a public, checkable selling plan to show exchanges, market makers and holders. Buyers and keepers pay no PLEDGE fee, only normal gas.
+- **Fee (planned):** 0.25% of filled sale proceeds in USDC, taken as each sale fills, so the team pays only when the plan works. Not implemented in the testnet contract.
+- **Comparables:** Streamflow charges 0.16 SOL plus 0.19% of tokens vested, or 0.5% for a token lock ([source](https://streamflow.finance/blog/how-much-does-streamflow-cost)). Sablier's interface charges $0.99 per withdrawal ([source](https://docs.sablier.com/concepts/fees)).
+- **Size, illustration only:** 1% of 2025 insider unlocks ($18.77B) sold through PLEDGE at 0.25% is about $470K a year. This is the global unlock market, not proof of demand on Hyperliquid. No token team has committed yet.
+
+## Repository layout
+- `contracts/`: Foundry. `src/Pledge.sol`; `test/Pledge.t.sol` (16 unit tests, mocked precompiles); `test/PledgeFork.t.sol` (4 fork tests).
+- `web/`: React + Vite + viem + shadcn components, deployed on Cloudflare Pages. `docs/design/` has the design references, critiques and UI gate output.
+- `scripts/`: testnet deploy, funded sale (`real-sale.mjs`), funding, feature tests, keeper test. All testnet only.
+- `e2e/`: Playwright wallet flow with an injected test-key wallet, and the demo recorder.
+- `deployments/`: addresses, tx logs, fork simulation output.
+- `docs/pitch/`: pitch script, demo script, demo recording.
+
+## Setup
+```
+cd contracts && forge test --no-match-contract PledgeFork                     # 16 unit tests
+B=$(($(cast block-number --rpc-url https://rpc.hyperliquid-testnet.xyz/evm)-5))
+PX=$(cast call 0x0000000000000000000000000000000000000808 $(cast abi-encode "f(uint32)" 1035) --rpc-url https://rpc.hyperliquid-testnet.xyz/evm)
+FORK_BLOCK=$B PLEDGE=0x1cf99b8af3745deef01cc1c29708e10d4538e50e LIVE_PX=$(cast to-dec $PX) forge test --match-contract PledgeFork   # 4 fork tests
+cd ../web && npm i && npm run dev                                              # app at localhost:5173
+```
+Scripts read testnet keys from a local `.keys/` folder outside this repo. No keys are committed.
+
+## Built before and during the hackathon
+- **Before (spike, outside this repo):** Pledge v1, a cap and floor with a caller-set price, 5 tests and a v1 testnet deploy.
+- **During (Oct 10 to 11, 2026, all commits in this repo):** v2 contract (oracle-band price set by the contract, filled-size cap from the Core balance, start time, cancel proof), 16 unit and 4 fork tests, testnet deploys, real funded sales, the web app and three redesigns, the wallet E2E, on-chain feature tests, the site's judge and business sections, and this README.
 
 ## Known limits
-- The lock covers only the tokens inside the pledge. The team can still sell from other wallets.
-- Spot only, one token per pledge (HYPE/USDC @1035 in the demo). Sale proceeds (USDC) stay in the contract until `release` after the end date.
-- On testnet the 0x808 oracle (≈22.5) can differ from the book mid (≈26). A sell IOC fills at the best bid at or above the limit.
+- The lock covers only tokens inside the agreement. A team can still sell from other wallets.
+- Spot only, one token per agreement (HYPE/USDC, spot index 1035, in the demo).
+- USDC proceeds stay in the contract until the end date.
+- The testnet book is thin. The fills above were against bids already on the book.

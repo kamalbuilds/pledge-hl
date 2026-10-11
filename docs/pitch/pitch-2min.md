@@ -1,18 +1,21 @@
 # PLEDGE: 2 minute pitch
 
-## The problem (20s)
-When a token unlocks, holders fear one thing: the team or an investor dumps it all at once. Today the only answer is a promise in a blog post or a market maker contract nobody can see. Tokenomist counts $97.43B of tokens unlocked in 2025, $18.77B of it to insiders. HYPE alone unlocked about $496M.
+About 280 words. Speak it in about 2 minutes.
 
-## What PLEDGE is (30s)
-PLEDGE is a lock agreement for unlocked supply, enforced by a contract on HyperEVM. The team deposits tokens. The contract can only sell them on the HyperCore spot book, at most a fixed amount per day, never below a floor price, and never more than a set distance below the oracle price. No one can cancel it or withdraw early, the team included. Anyone can trigger the daily sale.
+## Hook (0:00 to 0:15)
+Every big token unlock asks the same question: is the team about to dump? Last year $97 billion of tokens unlocked, almost $19 billion of it to insiders. The answer today is a blog post, or a market maker deal nobody can see.
 
-## Why it is credible (30s)
-It is live on Hyperliquid testnet, not a mockup. Real sales filled on HyperCore, including 0.5 HYPE at 22.538 USDC from a browser wallet test. The contract counts filled size, not requested size, so an unfilled order gives its allowance back. Cancel, early withdraw and oversized sales all revert, and anyone can check that from the page in one click.
+## What PLEDGE is (0:15 to 0:45)
+PLEDGE turns that promise into a contract on Hyperliquid. The team locks its unlocked tokens in PLEDGE. From then on, the contract is the only thing that can sell them. It sells on the Hyperliquid order book, at most a set amount per day, never below a floor price, at a price it reads from the oracle itself. Nobody can cancel it or take the tokens out early, not even the team. Anyone can trigger the daily sale.
 
-## Who pays (20s)
-The token team pays. We propose 0.25% of filled sale proceeds, so they only pay when the plan works. Streamflow charges 0.19% to 0.5% of the tokens just to vest or lock them. Buyers and keepers pay no PLEDGE fee, only normal gas.
+## Proof it works (0:45 to 1:15)
+This is live on Hyperliquid testnet today. We locked HYPE, the contract sold it, and the order really filled on the Hyperliquid book. A second sale the same day was rejected. An order that did not fill gave its allowance back. Cancelling, withdrawing early and selling under the floor all fail on-chain. Every one of those is a transaction a judge can open.
 
-## What is next (20s)
-Mainnet deploy, the fee in the contract, support for any HyperCore spot token, and a public list of all active agreements so exchanges and holders can see who has pledged. Try it at https://pledge-ccs.pages.dev.
+## Why Hyperliquid (1:15 to 1:30)
+Only Hyperliquid lets a smart contract place orders on a real order book and read the oracle directly. That is what makes the sale price impossible to game.
 
-Sources: https://www.tokenomist.ai/research/2025-token-unlocks-review-a-complete-breakdown-of-emissions-insider-vesting-and-market-impact , https://streamflow.finance/blog/how-much-does-streamflow-cost
+## Business (1:30 to 1:50)
+The team pays. We plan to charge 0.25% of what is actually sold, so they only pay when the plan is working. Vesting tools like Streamflow already charge 0.19 to 0.5%, just to lock tokens.
+
+## Ask (1:50 to 2:00)
+We are looking for the first token teams on Hyperliquid to pledge their next unlock. Try it at pledge-ccs.pages.dev.
