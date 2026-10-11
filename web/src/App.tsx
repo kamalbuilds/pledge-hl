@@ -110,7 +110,7 @@ function Agreement({ addr }: { addr: Address }) {
                 <label className="field dep-l">Amount, HYPE<input inputMode="decimal" value={depAmt} onChange={e => setDepAmt(e.target.value)} aria-invalid={!depOk} /></label>
                 {!depOk && <p className="err">Enter an amount above 0, at most 8 decimals.</p>}
                 <DialogFooter><DialogClose asChild><button className="btn btn-ghost">Go back</button></DialogClose><button className="btn btn-primary" onClick={deposit} disabled={!depOk}>Lock {depAmt} HYPE</button></DialogFooter></DialogContent></Dialog>
-            : <button className="btn btn-primary wide" onClick={sellSlice} disabled={!!busy}>{busy === 'Sale' ? 'Submitting sale' : "Trigger today's sale"}</button>}
+            : <button className="btn btn-primary wide" onClick={sellSlice} disabled={!!busy || halted}>{busy === 'Sale' ? 'Submitting sale' : halted ? 'Sales halted under the floor' : "Trigger today's sale"}</button>}
           <p className="muted">{ended ? 'The term is over. Only the team wallet can withdraw what is left.' : before ? <>Selling starts {dt(Number(s.start))}. You can deposit now.</> : used ? (s.balance === 0n ? 'Nothing left to sell. Selling needs a new deposit.' : "Today's allowance is used. Selling resumes at the next reset.") : 'Anyone may trigger it. The caller picks only the size.'}</p>
           <button className="btn btn-ghost" onClick={reconcile} disabled={!!busy}>{busy === 'Reconcile' ? 'Reconciling' : 'Reconcile fills'}</button>
         </div>

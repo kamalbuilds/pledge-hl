@@ -15,3 +15,7 @@ r8 7.7/5.5, r9 8.1/6.5, r10 capture flake (unstyled), r11 7.9/6.5, r12 8.1/6.5, 
 FINAL: 8.3 min=7.5 round=13 critic=fresh:codex-exec-r13 review=/Users/kamal/Desktop/solana/cwf/hyperliquid/projects/pledge/web/docs/design/design-audit-r13.md
 r14 8.1/7 (after feature audit)
 FINAL: 8.1 min=7 round=14 critic=fresh:codex-exec-r14 review=/Users/kamal/Desktop/solana/cwf/hyperliquid/projects/pledge/web/docs/design/design-audit-r14.md
+
+## v4 (wise product UI), rounds 15-17
+r15 6.1 (min 4.5) -> r16 7.7 (min 6.5) -> r17 8.0 (min 7.0), Design B, AI Slop A. After r17: halted agreements disable the sale button, success chip contrast darkened, lime focus ring on the dark band.
+FINAL: 8.0 min=7 round=17 critic=fresh:codex-exec-r17 review=/Users/kamal/Desktop/solana/cwf/hyperliquid/projects/pledge/web/docs/design/design-audit-r17.md

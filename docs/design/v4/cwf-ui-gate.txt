@@ -1,0 +1,12 @@
+ok   references: 3 captured
+ok   components logged
+ok   score 8.0 min 7
+ok   critic fresh:codex-exec-r17
+ok   r17-1440.png fresh
+ok   r17-390.png fresh
+ok   design-review grades A/B
+ok   uicraft gate
+ok   cwf banned grep
+ok   slop-check
+---- 0 failure(s)
+EXIT 0

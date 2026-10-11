@@ -1,6 +1,6 @@
 /* Hallmark · macrostructure: product dashboard (summary band + cards + sticky action panel) · theme: wise-inspired · v4. See ../../docs/design/DESIGN.md */
 :root{--canvas:#F2F5EF;--surface:#FFFFFF;--surface-2:#E8EBE6;--band:#163300;--ink:#0E0F0C;--body:#454745;--mute:#6B6D69;--line:#DDE2D8;
-  --primary:#9FE870;--primary-hover:#B8F28F;--on-primary:#0E0F0C;--positive:#1F8A3A;--positive-bg:#E2F6D5;--warn:#8A4E00;--warn-bg:#FFF4CC;--danger:#B3262C;--danger-bg:#FBE5E6;
+  --primary:#9FE870;--primary-hover:#B8F28F;--on-primary:#0E0F0C;--positive:#17692E;--positive-bg:#E2F6D5;--warn:#8A4E00;--warn-bg:#FFF4CC;--danger:#B3262C;--danger-bg:#FBE5E6;
   --radius-card:16px;--radius-input:10px;--radius-pill:9999px;--shadow-card:0 1px 2px rgba(14,15,12,.06),0 8px 24px rgba(14,15,12,.06);
   --font-display:"Figtree",ui-sans-serif,sans-serif;--font-sans:"Figtree",ui-sans-serif,sans-serif;--font-mono:"JetBrains Mono",ui-monospace,monospace}
 html,body{background:var(--canvas);color:var(--ink);font-family:var(--font-sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -75,6 +75,7 @@ a.link{color:var(--band);font-weight:600;text-decoration:underline;text-underlin
 .create .grid>.panel{grid-column:2}@media (max-width:960px){.create .grid>.panel{grid-column:1;grid-row:2}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .done-row{display:grid;gap:12px;margin-bottom:12px}.done-row>div:first-child{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px}.done-row b{font-size:28px}.done-row span{color:#5A5C58}
+.band .btn:focus-visible,.band a:focus-visible{outline-color:var(--primary)}
 .foot{margin-top:32px;font-size:12px;color:var(--mute);text-align:center}
 .sign{border-radius:20px!important;background:var(--surface)!important;font-family:var(--font-sans)}
 .sign-l{display:grid;gap:8px;padding-left:20px;color:var(--body)}

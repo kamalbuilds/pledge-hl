@@ -1,0 +1,14 @@
+ok   webfont loaded
+ok   primary font: Figtree
+ok   tables: 4, none bare
+ok   no Markdown rendering
+ok   links styled
+ok   CSS variables defined (21 decls)
+ok   button styles present
+ok   status chips/badges styled (21)
+ok   surfaces/cards present
+ok   summary metrics present
+ok   radius mixed (1 zero, 25 non-zero)
+---
+slop-check: PASS
+EXIT 0
