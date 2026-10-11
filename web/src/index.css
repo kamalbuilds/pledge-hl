@@ -1,8 +1,9 @@
 @import "tailwindcss";
-/* shadcn tokens mapped to DESIGN.md (PLEDGE term sheet v3). */
+/* shadcn tokens mapped to docs/design/DESIGN.md (PLEDGE v4, wise-inspired). */
 @theme inline {
-  --color-background: #FAF8F3; --color-foreground: #1A1D21; --color-primary: #1F3A5F; --color-primary-foreground: #FAF8F3;
-  --color-secondary: #EFEBE2; --color-secondary-foreground: #1A1D21; --color-muted: #EFEBE2; --color-muted-foreground: #5B6470;
-  --color-accent: #EFEBE2; --color-accent-foreground: #1A1D21; --color-destructive: #8A2E1F; --color-border: #DDD7CA; --color-input: #1A1D21; --color-ring: #1F3A5F;
-  --color-popover: #FAF8F3; --color-popover-foreground: #1A1D21; --color-amber: #B7791F; --radius: 2px;
+  --color-background: #F2F5EF; --color-foreground: #0E0F0C; --color-primary: #9FE870; --color-primary-foreground: #0E0F0C;
+  --color-secondary: #E8EBE6; --color-secondary-foreground: #0E0F0C; --color-muted: #E8EBE6; --color-muted-foreground: #6B6D69;
+  --color-accent: #E8EBE6; --color-accent-foreground: #0E0F0C; --color-destructive: #D03238; --color-border: #DDE2D8; --color-input: #DDE2D8; --color-ring: #163300;
+  --color-popover: #FFFFFF; --color-popover-foreground: #0E0F0C; --radius: 16px;
+  --font-sans: "Figtree", ui-sans-serif, sans-serif; --font-display: "Figtree", ui-sans-serif, sans-serif; --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }

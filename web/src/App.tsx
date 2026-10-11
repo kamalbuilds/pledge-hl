@@ -1,61 +1,54 @@
-/* Hallmark · pre-emit critique: P5 H5 E4 S5 R4 V4. v3 of direction "Vesting contract / term sheet" (cwf/docs/DESIGN-DIRECTIONS.md) */
+/* Hallmark · macrostructure: product dashboard · theme: wise-inspired v4 (docs/design/DESIGN.md) */
 import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Address } from 'viem';
 import { ABI, BYTECODE, DEMO, DEMO_DEPLOY_TX, EXPLORER, readState, attempt, wallet, coreFills, fmt8, short, pub, revertReason, type State } from './chain';
 import forkSim from './fork-sim.json';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
 
 type Fill = { coin: string; px: string; sz: string; side: string; time: number; hash: string };
-const route = () => { const h = location.hash.replace(/^#\/?/, ''); if (h.startsWith('create')) return { page: 'create' as const }; const m = h.match(/^p\/(0x[0-9a-fA-F]{40})/); return { page: 'pledge' as const, addr: (m ? m[1] : DEMO) as Address }; };
+const route = () => { const h = location.hash.replace(/^#\/?/, ''); if (h.startsWith('create')) return { page: 'create' as const }; if (h.startsWith('judges')) return { page: 'judges' as const, addr: DEMO as Address }; if (h.startsWith('business')) return { page: 'business' as const, addr: DEMO as Address }; const m = h.match(/^p\/(0x[0-9a-fA-F]{40})/); return { page: 'pledge' as const, addr: (m ? m[1] : DEMO) as Address }; };
 const dt = (s: number) => new Date(s * 1000).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+const Addr = ({ a, kind = 'address' }: { a: string; kind?: 'address' | 'tx' }) => <a className="link mono" href={`${EXPLORER}/${kind}/${a}`} target="_blank" rel="noreferrer" title={a}>{short(a)}</a>;
 
 export default function App() {
   const [r, setR] = useState(route()); useEffect(() => { const f = () => setR(route()); addEventListener('hashchange', f); return () => removeEventListener('hashchange', f); }, []);
-  useEffect(() => { document.title = r.page === 'create' ? 'PLEDGE: draft a new lock agreement' : `PLEDGE: lock agreement ${short(r.addr)}`; }, [r]);
-  return <div className="page">
-    <header className="mast">
-      <a href="#/" className="word">Pledge</a>
-      <p className="mast-note">Lock agreements for unlocked supply, enforced by a HyperEVM contract. Testnet 998.</p>
-      <a href={r.page === 'create' ? '#/' : '#/create'} className="mast-link">{r.page === 'create' ? 'Back to the demo agreement' : 'Draft a new agreement'}</a>
+  useEffect(() => { document.title = r.page === 'create' ? 'PLEDGE: new lock agreement' : `PLEDGE: agreement ${short(r.addr)}`; }, [r]);
+  return <div className="shell">
+    <header className="topbar">
+      <a href="#/" className="brand"><span className="brand-mark" aria-hidden>P</span>Pledge</a>
+      <nav className="tabs" aria-label="Pages">{([['#/', 'Agreement', 'pledge'], ['#/judges', 'For judges', 'judges'], ['#/business', 'Business', 'business']] as const).map(([h, t, p]) => <a key={p} href={h} className={'tab' + (r.page === p ? ' on' : '')} aria-current={r.page === p ? 'page' : undefined}>{t}</a>)}</nav>
+      {r.page === 'create' ? <a href="#/" className="btn btn-secondary">Back to demo agreement</a> : <a href="#/create" className="btn btn-secondary">Draft a new agreement</a>}
     </header>
-    {r.page === 'create' ? <Create /> : <Agreement key={r.addr} addr={r.addr} />}
-    <footer className="foot">{r.page === 'create' ? <p>Deploying creates a new contract on HyperEVM testnet from your connected wallet. Terms are fixed at deployment.</p> : <p>Figures on this page are read live from HyperEVM testnet and HyperCore testnet. Rows marked <span className="sim">fork-simulated</span> ran on a forge fork with HyperCore mocked, and are shown only where a real run was not possible.</p>}</footer>
+    {r.page === 'create' ? <Create /> : r.page === 'judges' ? <main><Judges addr={DEMO as Address} /></main> : r.page === 'business' ? <main><Business /></main> : <Agreement key={r.addr} addr={r.addr} />}
+    <footer className="foot">Hyperliquid testnet · HyperEVM 998 + HyperCore. All figures are read live from Hyperliquid testnet. Anything fork-simulated is labeled as such.</footer>
   </div>;
 }
 
-/* Signature component: the release staircase (Figure 1). Amber steps: cumulative HYPE the contract may sell. Navy steps: cumulative filled on HyperCore. Dots: real fills. */
-function Staircase({ start, end, cap, deposited, fills, fillsErr }: { start: number; end: number; cap: number; deposited: number; fills: Fill[]; fillsErr?: boolean }) {
-  const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440); useEffect(() => { const o = () => setVw(window.innerWidth); window.addEventListener('resize', o); return () => window.removeEventListener('resize', o); }, []); const narrow = vw < 600; const days = Math.max(1, Math.round((end - start) / 86400)), W = narrow ? 360 : 760, H = narrow ? 250 : 330, L = 44, B = 30, T = 16, R = 16;
+function Chart({ start, end, cap, deposited, fills }: { start: number; end: number; cap: number; deposited: number; fills: Fill[] }) {
+  const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1440); useEffect(() => { const o = () => setVw(window.innerWidth); addEventListener('resize', o); return () => removeEventListener('resize', o); }, []);
+  const narrow = vw < 600, days = Math.max(1, Math.round((end - start) / 86400)), W = narrow ? 340 : 720, H = narrow ? 200 : 220, L = 44, B = 28, T = 16, R = 16;
   const elapsed = Math.max(0, (Date.now() / 1000 - start) / 86400), shown = Math.min(days, Math.max(3, Math.ceil(elapsed) + 2));
-  const max = Math.max(deposited, cap, 0.0001) * 1.25;
-  const x = (d: number) => L + (d / shown) * (W - L - R), y = (v: number) => T + (1 - Math.min(v, max) / max) * (H - T - B);
-  const lim = (v: number) => Math.min(v, deposited); let allow = `M${x(0)},${y(0)}`; for (let d = 0; d < shown; d++) { allow += ` V${y(lim(cap * (d + 1)))} H${x(d + 1)}`; }
+  const max = Math.max(deposited, cap, 0.0001) * 1.25; const x = (d: number) => L + (d / shown) * (W - L - R), y = (v: number) => T + (1 - Math.min(v, max) / max) * (H - T - B);
+  const lim = (v: number) => Math.min(v, deposited); let allow = `M${x(0)},${y(0)}`; for (let d = 0; d < shown; d++) allow += ` V${y(lim(cap * (d + 1)))} H${x(d + 1)}`;
   const pts = fills.filter(f => f.side === 'A').map(f => ({ d: (f.time / 1000 - start) / 86400, sz: Number(f.sz), px: f.px })).sort((a, b) => a.d - b.d);
-  let cum = 0, sold = `M${x(0)},${y(0)}`; const dots = pts.map(p => { sold += ` H${x(p.d)}`; cum += p.sz; sold += ` V${y(cum)}`; return { ...p, cum }; });
-  const today = Math.min(shown, elapsed); sold += ` H${x(today)}`;
-  const rows = Array.from({ length: Math.min(shown, 6) }, (_, d) => ({ d: d + 1, allowed: lim(cap * (d + 1)), filled: pts.filter(p => p.d < d + 1).reduce((a, p) => a + p.sz, 0), future: d + 1 > Math.ceil(elapsed) }));
-  return <figure className="fig1" aria-labelledby="fig1-cap">
-    <div className="fig1-head"><p className="fig1-n">Figure 1</p><h2 id="fig1-cap">Ceiling and fills, HYPE</h2></div>
-    <div className="fig1-body">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Up to ${cap} HYPE per day may be sold; ${cum} HYPE sold so far`}>
-        {[0, lim(cap * shown) / max / 2, lim(cap * shown) / max, 1].map(f => <g key={f}><line x1={L} x2={W - R} y1={y(max * f)} y2={y(max * f)} className="grid" /><text x={L - 8} y={y(max * f) + 4} className="ax" textAnchor="end">{+(max * f).toFixed(2)}</text></g>)}
-        {Array.from({ length: shown + 1 }, (_, d) => d).filter(d => !narrow || d % 2 === 0 || d === shown).map(d => <text key={d} x={x(d)} y={H - 8} className="ax" textAnchor={d === shown ? 'end' : d === 0 ? 'start' : 'middle'}>{d === 0 ? 'start' : 'day ' + d}</text>)}
-        <text x={W - R} y={y(lim(cap * shown)) - 8} className="ax depl" textAnchor="end">ceiling {+lim(cap * shown).toFixed(4)} HYPE</text>
-        <path d={allow} className="allow" /><path d={sold} className="sold" />
-        <line x1={x(today)} x2={x(today)} y1={T} y2={H - B} className="now" /><text x={x(today) + 6} y={T + 10} className="ax">now</text>
-        {dots.map((p, i) => <g key={i}><circle cx={x(p.d)} cy={y(p.cum)} r="6" className="dot" />{i === dots.length - 1 && <text x={x(p.d) > W * 0.4 ? x(p.d) - 12 : x(p.d) + 12} textAnchor={x(p.d) > W * 0.4 ? 'end' : 'start'} y={y(p.cum) + 20} className="ax dotl">{i === dots.length - 1 && p.cum >= deposited - 1e-9 ? `all ${+p.cum.toFixed(4)} HYPE deposited is sold` : `${+p.cum.toFixed(4)} HYPE filled`}</text>}</g>)}
-      </svg>
-      <details className="fig1-tw" open={!narrow}><summary>Show values by day</summary><Table className="fig1-table"><TableHeader><TableRow><TableHead>Day</TableHead><TableHead className="num">Ceiling</TableHead><TableHead className="num">Filled</TableHead></TableRow></TableHeader>
-        <TableBody>{rows.map(r => <TableRow key={r.d} className={r.future ? 'future' : ''}><TableCell>{r.d}</TableCell><TableCell className="num">{+r.allowed.toFixed(2)}</TableCell><TableCell className="num">{r.future ? '' : +r.filled.toFixed(4)}</TableCell></TableRow>)}</TableBody></Table></details>
-    </div>
-    <figcaption><span className="lg"><span className="k allowk" />Ceiling: the most that may have sold, capped by the deposit</span><span className="lg"><span className="k soldk" />Filled on HyperCore</span><span className="lg"><span className="k dotk" />Real HyperCore fill (details in clause 6)</span><span className="src">Source: live testnet reads{fillsErr ? <span className="bad">; fill history is unavailable right now, so fills may be missing</span> : null}.</span></figcaption>
+  let cum = 0, sold = `M${x(0)},${y(0)}`; const dots = pts.map(p => { sold += ` H${x(p.d)}`; cum += p.sz; sold += ` V${y(cum)}`; return { ...p, cum }; }); const today = Math.min(shown, elapsed); sold += ` H${x(today)}`;
+  const ticks = [0, lim(cap * shown) / 2, lim(cap * shown)];
+  return <figure className="fig1 chart" style={{ margin: 0 }}>
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Ceiling ${+lim(cap * shown).toFixed(4)} HYPE; ${+cum.toFixed(4)} HYPE filled`}>
+      {ticks.map(v => <g key={v}><line x1={L} x2={W - R} y1={y(v)} y2={y(v)} className="grid-l" /><text x={L - 8} y={y(v) + 4} className="ax" textAnchor="end">{+v.toFixed(2)}</text></g>)}
+      {Array.from({ length: shown + 1 }, (_, d) => d).filter(d => !narrow || d % 2 === 0 || d === shown).map(d => <text key={d} x={x(d)} y={H - 6} className="ax" textAnchor={d === shown ? 'end' : d === 0 ? 'start' : 'middle'}>{d === 0 ? 'start' : 'day ' + d}</text>)}
+      <path d={allow} className="allow" /><path d={sold} className="sold" />
+      <line x1={x(today)} x2={x(today)} y1={T} y2={H - B} className="now" /><text x={x(today) + 6} y={T + 12} className="ax">now</text>
+      {dots.map((p, i) => <g key={i}><circle cx={x(p.d)} cy={y(p.cum)} r="6" className="dot" />{i === dots.length - 1 && <text x={x(p.d) > W * 0.4 ? x(p.d) - 12 : x(p.d) + 12} textAnchor={x(p.d) > W * 0.4 ? 'end' : 'start'} y={y(p.cum) + 22} className="lbl" dy={-30}>{p.cum >= deposited - 1e-9 ? `all ${+p.cum.toFixed(4)} HYPE sold` : `${+p.cum.toFixed(4)} HYPE filled`}</text>}</g>)}
+    </svg>
+    <figcaption className="legend"><span><i style={{ background: '#3F7A1F' }} />Ceiling: most that may have sold</span><span><i style={{ background: '#0E0F0C' }} />Filled on HyperCore</span><span><i style={{ background: '#9FE870', height: 8, width: 8, borderRadius: 4 }} />Real fill</span></figcaption>
   </figure>;
 }
 
 function Countdown({ to }: { to: number }) { const [n, setN] = useState(Date.now()); useEffect(() => { const i = setInterval(() => setN(Date.now()), 1000); return () => clearInterval(i); }, []);
-  const s = Math.max(0, Math.floor(to - n / 1000)); return <span className="fig">{Math.floor(s / 86400)}d {Math.floor(s % 86400 / 3600)}h {Math.floor(s % 3600 / 60)}m</span>; }
+  const s = Math.max(0, Math.floor(to - n / 1000)); return <span className="mono">{Math.floor(s / 86400)}d {Math.floor(s % 86400 / 3600)}h {Math.floor(s % 3600 / 60)}m</span>; }
 
 type Try = { label: string; btn: string; fn: string; args: any[]; as: 'team' | 'anyone'; rule: string; tx?: string };
 function Agreement({ addr }: { addr: Address }) {
@@ -63,8 +56,8 @@ function Agreement({ addr }: { addr: Address }) {
   const [tries, setTries] = useState<Record<string, { ok: boolean; reverted?: boolean; reason: string; at: string }>>({}); const [busy, setBusy] = useState(''); const [running, setRunning] = useState(''); const [log, setLog] = useState<string[]>([]);
   const load = useCallback(async () => { try { const [st, f] = await Promise.all([readState(addr), coreFills(addr).then(x => ({ ok: true, x })).catch(() => ({ ok: false, x: [] as Fill[] }))]); setS(st); setFillsErr(!f.ok); if (f.ok) { setFills(f.x); setFillsLoaded(true); } setErr(''); setStale(false); } catch (e) { if (hasState.current) setStale(true); else setErr(revertReason(e)); } }, [addr]);
   useEffect(() => { load(); const i = setInterval(load, 20000); return () => clearInterval(i); }, [load]);
-  if (err) return <main className="doc-solo"><p className="bad">Could not read agreement {addr}. {err}</p><button className="btn-outline" onClick={load}>Try again</button></main>;
-  if (!s) return <main className="doc-solo"><p>Reading agreement {short(addr)} from HyperEVM testnet.</p></main>;
+  if (err) return <main className="card" role="alert"><div className="card-h"><h2>Could not read this agreement</h2><span className="chip bad">RPC error</span></div><p className="mono">{short(addr)}: {err}</p><div style={{ marginTop: 16 }}><button className="btn btn-secondary" onClick={load}>Try again</button></div></main>;
+  if (!s) return <main className="band" aria-busy="true"><p className="sub">Reading agreement <span className="mono">{short(addr)}</span> from HyperEVM testnet.</p><div className="metrics">{[0, 1, 2, 3].map(i => <div className="metric" key={i}><div className="k">Loading</div><div className="v">…</div></div>)}</div></main>;
   const cap = Number(s.cap) / 1e8, sells = fills.filter(f => f.side === 'A'), soldAll = sells.reduce((a, f) => a + Number(f.sz), 0);
   const proceedsN = sells.reduce((a, f) => a + Number(f.sz) * Number(f.px), 0);
   const known = fillsLoaded; const soldTxt = known ? `${+soldAll.toFixed(4)} HYPE` : 'an unknown amount of HYPE'; const procTxt = known ? `${proceedsN.toFixed(2)} USDC` : 'unknown USDC'; const deposited = Number(s.balance) / 1e8 + (known ? soldAll : 0) + Number(s.pending) / 1e8, halted = s.limit < s.floor || s.oracle === 0n, isDemo = addr.toLowerCase() === DEMO.toLowerCase();
@@ -83,145 +76,160 @@ function Agreement({ addr }: { addr: Address }) {
     const hl = await import('@nktkas/hyperliquid'); const w = await wallet(); const ex = new hl.ExchangeClient({ wallet: w as any, transport: new hl.HttpTransport({ isTestnet: true }) });
     const before = s.balance; await ex.spotSend({ destination: addr, token: 'HYPE:0x7317beb7cceed72ef0b346074cc8e7ab', amount: amt }); for (let i = 0; i < 10; i++) { await new Promise(r => setTimeout(r, 2000)); const st = await readState(addr).catch(() => null); if (st && st.balance > before) { const inc = Number(st.balance - before) / 1e8; return Math.abs(inc - Number(amt)) < 1e-8 ? `${amt} HYPE locked on HyperCore; contract balance is now ${fmt8(st.balance)} HYPE` : `Sent ${amt} HYPE; the contract balance changed by ${+inc.toFixed(8)} HYPE to ${fmt8(st.balance)} HYPE`; } } return `${amt} HYPE sent; the contract balance has not updated yet, refresh in a minute`; });
   const used = s.remaining === 0n || s.balance === 0n; const depOk = /^\d+(\.\d{1,8})?$/.test(depAmt) && Number(depAmt) > 0 && Number(depAmt) <= 1e6;
-
-  return <main className="agreement">
-    <section className="top">
-      <div className="top-text">
-        <p className="ref">Agreement <a href={`${EXPLORER}/address/${addr}`} target="_blank" rel="noreferrer" className="fig">{short(addr)}</a> on HyperEVM testnet, signed by team <span className="fig">{short(s.team)}</span></p>
-        <h1>Lock agreement: {known ? +deposited.toFixed(4) : `at least ${+deposited.toFixed(4)}`} HYPE deposited, {fmt8(s.balance)} still locked</h1>
-        <div className="now-line" role="status"><p className="avail"><span className="avail-k">Available to sell now</span> <span className="fig avail-v">{fmt8(s.remaining < s.balance ? s.remaining : s.balance)} HYPE</span> <button className="btn-outline jump" onClick={() => s.balance === 0n ? setDepOpen(true) : document.getElementById('status')?.scrollIntoView()}>{s.balance === 0n ? 'Deposit HYPE' : 'Go to actions'}</button></p><p><span className="fig">{fmt8(s.balance)} HYPE</span> locked now. <span className="fig">{soldTxt}</span> sold for <span className="fig">{procTxt}</span>. {s.balance === 0n ? <>Nothing left to sell until the team deposits more.</> : <>Next allowance in <Countdown to={nextDay} />.</>}{stale && <span className="bad"> The testnet RPC did not answer the last refresh; showing the previous read.</span>}{fillsErr && <span className="bad"> {known ? 'Fill history unavailable right now; sold and proceeds show the last successful read.' : 'Fill history has not loaded yet, so amounts sold are unknown.'}</span>}</p></div>
-        <p className="lede">The team placed this supply with a contract that sells it on the HyperCore spot book, at most {cap} HYPE a day, never below ${fmt8(s.floor, 2)}. No one can change or cancel these terms, the team included.</p>
+  const avail = s.remaining < s.balance ? s.remaining : s.balance; const pct = cap > 0 ? Math.min(100, Number(s.sold) / 1e8 / cap * 100) : 0;
+  return <main>
+    <section className="band" aria-label="Summary">
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ display: 'grid', gap: 8 }}>
+          <p className="addr">Lock agreement <Addr a={addr} /> · team <Addr a={s.team} /></p>
+          <h1>{known ? +deposited.toFixed(4) : `≥ ${+deposited.toFixed(4)}`} HYPE pledged, sold on a schedule</h1>
+          <p className="sub">At most {cap} HYPE a day on the HyperCore book, never below ${fmt8(s.floor, 2)}. Nobody can cancel it, the team included.</p>
+        </div>
+        <div className="chips">{halted ? <span className="chip bad">Halted: under floor</span> : s.balance === 0n ? (known && soldAll > 0 ? <span className="chip ok">Fully sold</span> : <span className="chip warn">Awaiting deposit</span>) : <span className="chip ok">Active</span>}<span className="chip dark">Not cancelable</span><span className="chip dark">Testnet</span></div>
       </div>
-      <nav className="jumps" aria-label="Sections">{[['c1', 'Terms'], ['c6', 'Sales'], ['status', 'Status'], ['judges', 'For judges'], ['business', 'Business']].map(([id, t]) => <button key={id} className="btn-text" onClick={() => document.getElementById(id)?.scrollIntoView()}>{t}</button>)}</nav>
-      {known ? <Staircase start={Number(s.start)} end={Number(s.end)} cap={cap} deposited={deposited} fills={fills} fillsErr={fillsErr} /> : <figure className="fig1"><div className="fig1-head"><p className="fig1-n">Figure 1</p><h2>Ceiling and fills, HYPE</h2></div><p role="status">{fillsErr ? 'The fill history from HyperCore has not loaded, so this figure is not drawn. It retries every 20 seconds.' : 'Loading the fill history from HyperCore.'}</p></figure>}
+      <div className="metrics now-line" role="status">
+        <div className="metric"><div className="k">Available to sell now</div><div className="v avail-v">{fmt8(avail)} HYPE</div></div>
+        <div className="metric"><div className="k">Locked now</div><div className="v">{fmt8(s.balance)}<small>HYPE</small></div></div>
+        <div className="metric"><div className="k">Sold to date</div><div className="v">{known ? +soldAll.toFixed(4) : '?'}<small>HYPE</small></div></div>
+        <div className="metric"><div className="k">Gross sale proceeds</div><div className="v">{known ? proceedsN.toFixed(2) : '?'}<small>USDC</small></div></div>
+      </div>
+      {(stale || fillsErr) && <p className="sub" role="alert">{stale ? 'The testnet RPC did not answer the last refresh; showing the previous read. ' : ''}{fillsErr ? (known ? 'Fill history is unavailable right now; sold and proceeds show the last good read.' : 'Fill history has not loaded yet, so amounts sold are unknown.') : ''}</p>}
     </section>
 
-    <div className="cols">
-      <article className="doc">
-        <ol className="clauses">
-          <li id="c1"><h2>Tokens locked</h2>
-            <p><span className="fig">{known ? '' : 'at least '}{+deposited.toFixed(4)} HYPE</span> deposited. <span className="fig">{fmt8(s.balance)} HYPE</span> is still locked on HyperCore (read live from HyperCore), and <span className="fig">{soldTxt}</span> has been sold for <span className="fig">{procTxt}</span>, which the contract holds until the end date.</p></li>
-          <li id="c2"><h2>Maximum sale per day</h2>
-            <p>At most <span className="fig">{cap} HYPE</span> of <em>filled</em> size in each 24-hour window. Today: <span className="fig">{fmt8(s.sold)}</span> sold, <span className="fig">{fmt8(s.pending)}</span> awaiting fill, <span className="fig">{fmt8(s.remaining)}</span> left. An order that does not fill returns its size to the day's allowance.</p></li>
-          <li id="c3"><h2>Sale price</h2>
-            <p>Each sale is an immediate-or-cancel order priced by the contract, not by the caller: the oracle price less {Number(s.dev) / 100}%, and never below the floor.</p>
-            <Table className="terms"><TableBody>
-              <TableRow><TableHead scope="row">Oracle price</TableHead><TableCell className="num">${fmt8(s.oracle, 3)}</TableCell></TableRow>
-              <TableRow><TableHead scope="row">Order limit</TableHead><TableCell className="num">${fmt8(s.limit, 3)}</TableCell></TableRow>
-              <TableRow><TableHead scope="row">Floor</TableHead><TableCell className="num">${fmt8(s.floor, 2)}</TableCell></TableRow>
-              <TableRow><TableHead scope="row">Price check</TableHead><TableCell className={'num ' + (halted ? 'bad' : '')}>{halted ? 'Fails: the order limit is under the floor, so sales halt' : 'Passes: the order limit is above the floor'}</TableCell></TableRow>
-            </TableBody></Table></li>
-          <li id="c4"><h2>Cannot cancel</h2>
-            <p>The contract has no cancel and no early-withdraw path. Each check below simulates the call against the live contract. It is read-only: no wallet, no gas, nothing is sent.</p>
-            <div className="attempts">{TRIES.map(t => { const r = tries[t.label]; return <div className="attempt" key={t.label}>
-              <div><p className="a-title">{t.label}</p><p className="meta">{t.rule}{t.tx && <> Already reverted on-chain in <a href={`${EXPLORER}/tx/${t.tx}`} target="_blank" rel="noreferrer" className="fig">{short(t.tx)}</a>.</>}</p></div>
-              <div className="a-act">{r ? <p className="verdict" role="status"><Badge variant={r.ok || !r.reverted ? 'outline' : 'destructive'}>{r.ok ? 'Allowed' : r.reverted ? 'Rejected by the contract' : 'Could not check (network)'}</Badge> <span className="fig">"{r.reason}"</span> <span className="meta fig">{r.at}</span></p> : <button className="btn-outline" onClick={() => run(t)} disabled={running === t.label} aria-busy={running === t.label}>{running === t.label ? 'Simulating' : t.btn}</button>}</div>
-            </div>; })}</div></li>
-          <li id="c5"><h2>Term</h2>
-            <p>Selling began <span className="fig">{dt(Number(s.start))}</span>. Any remainder can be withdrawn by the team from <span className="fig">{dt(Number(s.end))}</span>, in <Countdown to={Number(s.end)} />.</p></li>
-          <li id="c6"><h2>Record of sales</h2>
-            {fillsErr && <p className="bad" role="alert">Fill history could not be loaded from HyperCore just now{fills.length ? '; showing the last successful read' : ''}. It retries every 20 seconds.</p>}{fills.length === 0 ? <p>{fillsErr ? 'No fill history available.' : 'No fills yet.'} {fillsErr ? '' : ' The first sale appears here within seconds of filling on HyperCore.'}</p> :
-            <Table className="ledger"><TableHeader><TableRow><TableHead>Time</TableHead><TableHead className="hide-sm">Side</TableHead><TableHead className="num hide-sm">Size</TableHead><TableHead className="num hide-sm">Price</TableHead><TableHead className="hide-sm">HyperCore hash</TableHead></TableRow></TableHeader>
-              <TableBody>{fills.map(f => <TableRow key={f.hash + f.time}><TableCell className="fig">{new Date(f.time).toLocaleString()}<span className="show-sm">{f.side === 'A' ? 'Sold' : 'Bought'} <span className="fig">{f.sz} HYPE @ {f.px}</span></span><span className="show-sm meta">Real fill, hash <a href={`https://app.hyperliquid-testnet.xyz/explorer/tx/${f.hash}`} target="_blank" rel="noreferrer">{short(f.hash)}</a></span></TableCell><TableCell className="hide-sm">{f.side === 'A' ? 'Sell' : 'Buy'} <Badge variant="outline">real</Badge></TableCell><TableCell className="num hide-sm">{f.sz}</TableCell><TableCell className="num hide-sm">{f.px}</TableCell><TableCell className="fig hide-sm">{short(f.hash)}</TableCell></TableRow>)}</TableBody></Table>}
-            <details className="annex"><summary>Annex A. Checks run on a simulated copy of the chain <Badge variant="outline">fork-simulated</Badge></summary>
-              <p className="meta">{forkSim.note}</p>
-              <Table className="ledger"><TableBody>{forkSim.runs.map((x: any) => <TableRow key={x.name}><TableCell>{x.name}</TableCell><TableCell className="meta">{x.detail}</TableCell><TableCell className="num">{x.pass ? 'Pass' : 'Fail'}</TableCell></TableRow>)}</TableBody></Table></details>
-            {isDemo && <p className="meta">Agreement created in tx <a href={`${EXPLORER}/tx/${DEMO_DEPLOY_TX}`} target="_blank" rel="noreferrer" className="fig">{short(DEMO_DEPLOY_TX)}</a>.</p>}</li>
-        </ol>
-      </article>
+    <div className="grid">
+      <div className="stack">
+        <section className="card" id="c1" aria-labelledby="h-sched">
+          <div className="card-h"><div><h2 id="h-sched">Sale schedule</h2><p className="muted">Cumulative HYPE, first days of the term</p></div><span className="chip neutral">Day {dayIdx + 1} of {Math.round((Number(s.end) - Number(s.start)) / 86400)}</span></div>
+          {known ? <Chart start={Number(s.start)} end={Number(s.end)} cap={cap} deposited={deposited} fills={fills} /> : <figure className="fig1" style={{ margin: 0 }}><p className="muted" role="status">{fillsErr ? 'Fill history has not loaded, so the chart is not drawn. Retrying every 20 seconds.' : 'Loading fill history from HyperCore.'}</p></figure>}
+        </section>
 
-      <aside className="rail" id="status" aria-label="Agreement status">
-        <h2 className="rail-h">Agreement status</h2>
-        <dl className="attrs">
-          <div><dt>Locked now</dt><dd className="fig lock">{fmt8(s.balance)} HYPE</dd></div>
-          <div><dt>Sold today</dt><dd className="fig">{fmt8(s.sold)} of {cap}</dd></div>
-          <div><dt>Cancelable</dt><dd>No, by construction</dd></div>
-          <div><dt>Floor</dt><dd className="fig">${fmt8(s.floor, 2)}</dd></div>
-          <div><dt>Order limit now</dt><dd className="fig">${fmt8(s.limit, 3)}</dd></div>
-          <div><dt>Ends</dt><dd className="fig">{dt(Number(s.end))}</dd></div>
-        </dl>
-        <h3 className="rail-h3">Today's sale, day {dayIdx + 1}</h3>
-        <ol className="tl">
-          <li className="done"><span className="tl-dot" /><div><p>Allowance of <span className="fig">{cap} HYPE</span> opened</p><p className="meta fig">{new Date(dayStart * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p></div></li>
-          {todays.map(f => <li className="done" key={f.hash}><span className="tl-dot" /><div><p>Filled <span className="fig">{f.sz} HYPE @ {f.px}</span></p><p className="meta fig">{new Date(f.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p></div></li>)}
-          {s.pending > 0n && <li className="cur"><span className="tl-dot" /><div><p><span className="fig">{fmt8(s.pending)} HYPE</span> awaiting fill</p></div></li>}
-          <li className={used ? 'done' : 'cur'}><span className="tl-dot" /><div><p>{used ? (s.balance === 0n ? 'Nothing left to sell' : "Today's allowance is used") : <><span className="fig">{fmt8(s.remaining)} HYPE</span> may still be sold today</>}</p><p className="meta">Next allowance in <Countdown to={nextDay} /></p></div></li>
-        </ol>
-        <div className="rail-act">
-          {used ? <><p className="meta">{s.balance === 0n ? 'Nothing is left to sell. Another sale needs a new deposit and the next allowance.' : 'Selling resumes when the next allowance opens. Anyone may trigger it; the caller only picks the size.'}</p>
-              <Dialog open={depOpen} onOpenChange={setDepOpen}><DialogTrigger asChild><button className="btn-outline wide" disabled={!!busy}>{busy === 'Deposit' ? 'Depositing' : 'Deposit HYPE into this agreement'}</button></DialogTrigger>
-                <DialogContent className="sign"><DialogHeader><DialogTitle className="sign-t">Lock more HYPE</DialogTitle><DialogDescription className="sign-d">Sent from your HyperCore spot balance to this contract. It cannot be withdrawn before {dt(Number(s.end))}.</DialogDescription></DialogHeader>
-                  <label className="dep-l">Amount, HYPE<input inputMode="decimal" value={depAmt} onChange={e => setDepAmt(e.target.value)} aria-invalid={!depOk} /></label>
-                  {!depOk && <p className="bad">Enter an amount above 0, at most 8 decimals.</p>}
-                  <DialogFooter><DialogClose asChild><button className="btn-text">Go back</button></DialogClose><button className="btn-primary" onClick={deposit} disabled={!depOk}>Lock {depAmt} HYPE</button></DialogFooter></DialogContent></Dialog></>
-            : <><button className="btn-primary wide" onClick={sellSlice} disabled={!!busy}>{busy === 'Sale' ? 'Submitting sale' : "Trigger today's sale"}</button><p className="meta">Anyone may trigger it; the caller only picks the size.</p></>}
-          <button className="btn-text" onClick={reconcile} disabled={!!busy}>{busy === 'Reconcile' ? 'Reconciling' : 'Reconcile fills'}</button>
-          {log.length > 0 && <ul className="log" aria-live="polite">{log.map((l, i) => <li key={i} className="fig">{l}</li>)}</ul>}
+        <section className="card" id="c6" aria-labelledby="h-sales">
+          <div className="card-h"><h2 id="h-sales">Sales on HyperCore</h2><span className="chip ok">Real fills</span></div>
+          {fills.length === 0 ? <p className="muted">{fillsErr ? 'No fill history available right now.' : 'No fills yet. The first sale appears here seconds after it fills.'}</p> :
+            <><ul className="fill-list show-sm" aria-label="Sales">{fills.map(f => <li key={f.hash + f.time}><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span className={'chip ' + (f.side === 'A' ? 'ok' : 'neutral')}>{f.side === 'A' ? 'Sell' : 'Buy'}</span><b className="mono">{f.sz} HYPE</b><span className="muted">@ {f.px} USDC</span></div><div className="muted mono">{new Date(f.time).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} · <a className="link" href={`https://app.hyperliquid-testnet.xyz/explorer/tx/${f.hash}`} target="_blank" rel="noreferrer">{short(f.hash)}</a></div></li>)}</ul><Table className="dtable ledger hide-sm"><TableHeader><TableRow><TableHead>Time</TableHead><TableHead className="hide-sm">Side</TableHead><TableHead className="num">Size HYPE</TableHead><TableHead className="num">Price USDC</TableHead><TableHead className="hide-sm">Hash</TableHead></TableRow></TableHeader>
+              <TableBody>{fills.map(f => <TableRow key={f.hash + f.time}><TableCell className="mono">{new Date(f.time).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</TableCell><TableCell className="hide-sm"><span className={'chip ' + (f.side === 'A' ? 'ok' : 'neutral')}>{f.side === 'A' ? 'Sell' : 'Buy'}</span></TableCell><TableCell className="num">{f.sz}</TableCell><TableCell className="num">{f.px}</TableCell><TableCell className="hide-sm"><a className="link mono" href={`https://app.hyperliquid-testnet.xyz/explorer/tx/${f.hash}`} target="_blank" rel="noreferrer">{short(f.hash)}</a></TableCell></TableRow>)}</TableBody></Table></>}
+          <details className="more" style={{ marginTop: 12 }}><summary>Fork-simulated checks <span className="chip warn" style={{ marginLeft: 8 }}>fork-simulated</span></summary>
+            <p className="muted">{forkSim.note}</p>
+            <Table className="dtable"><TableBody>{forkSim.runs.map((x: any) => <TableRow key={x.name}><TableCell>{x.name}</TableCell><TableCell className="muted hide-sm">{x.detail}</TableCell><TableCell className="num"><span className={'chip ' + (x.pass ? 'ok' : 'bad')}>{x.pass ? 'Pass' : 'Fail'}</span></TableCell></TableRow>)}</TableBody></Table></details>
+        </section>
+
+        <section className="card" id="c3" aria-labelledby="h-price">
+          <div className="card-h"><h2 id="h-price">Price guard</h2>{halted ? <span className="chip bad">Fails: sales halt</span> : <span className="chip ok">Passes</span>}</div>
+          <p>Each sale is an immediate-or-cancel order priced by the contract, never by the caller: the oracle less {Number(s.dev) / 100}%, and never below the floor.</p>
+          <div className="stat3"><div><b>${fmt8(s.oracle, 3)}</b><span>Oracle (0x808)</span></div><div><b>${fmt8(s.limit, 3)}</b><span>Order limit</span></div><div><b>${fmt8(s.floor, 2)}</b><span>Floor</span></div></div>
+        </section>
+
+        <section className="card" id="c4" aria-labelledby="h-break">
+          <div className="card-h"><h2 id="h-break">Try to break it</h2><span className="chip neutral">Live, read-only</span></div>
+          <p className="muted" style={{ marginBottom: 12 }}>Each check simulates the call against the live contract. No wallet, no gas.</p>
+          <div className="checks">{TRIES.map(t => { const r = tries[t.label]; return <div className="check" key={t.label}>
+            <div><p className="t">{t.label}</p><p className="r">{t.rule}{t.tx && <> Already reverted on-chain: <Addr a={t.tx} kind="tx" />.</>}</p></div>
+            {r ? <div className="verdict" role="status"><span className={'chip ' + (r.ok ? 'warn' : r.reverted ? 'bad' : 'neutral')}>{r.ok ? 'Allowed' : r.reverted ? 'Rejected by the contract' : 'Could not check (network)'}</span><span className="mono">"{r.reason}" · {r.at}</span></div>
+              : <button className="btn btn-secondary" onClick={() => run(t)} disabled={running === t.label} aria-busy={running === t.label}>{running === t.label ? 'Simulating' : t.btn}</button>}
+          </div>; })}</div>
+        </section>
+
+        <section className="card" id="c5" aria-labelledby="h-term">
+          <div className="card-h"><h2 id="h-term">Term</h2><span className="chip neutral">Ends in <Countdown to={Number(s.end)} /></span></div>
+          <div className="kv" style={{ margin: 0 }}><div><dt>Selling began</dt><dd>{dt(Number(s.start))}</dd></div><div><dt>Team may withdraw from</dt><dd>{dt(Number(s.end))}</dd></div></div>
+          {isDemo && <p className="muted" style={{ marginTop: 12 }}>Created in tx <Addr a={DEMO_DEPLOY_TX} kind="tx" />.</p>}
+        </section>
+              </div>
+
+      <aside className="panel card" id="status" aria-label="Actions">
+        <div className="card-h"><h2>Today</h2><span className="chip neutral">Resets in <Countdown to={nextDay} /></span></div>
+        <div id="c2"><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginBottom: 6 }}><span>Counted toward the current window</span><span className="mono">{fmt8(s.sold)} / {cap} HYPE</span></div><div className="bar" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Share of today's cap sold"><span style={{ width: pct + '%' }} /></div></div>
+        <p className="muted" style={{ marginTop: 6 }}>The counter resets on the first call after 24 hours.</p><dl className="kv"><div><dt>Left in window</dt><dd>{fmt8(s.remaining)} HYPE</dd></div><div><dt>Awaiting fill</dt><dd>{fmt8(s.pending)} HYPE</dd></div><div><dt>Order limit</dt><dd>${fmt8(s.limit, 3)}</dd></div><div><dt>Floor</dt><dd>${fmt8(s.floor, 2)}</dd></div></dl>
+        {todays.length > 0 && <ul className="log" aria-label="Today's fills">{todays.map(f => <li key={f.hash}>Filled {f.sz} HYPE @ {f.px} · {new Date(f.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</li>)}</ul>}
+        <div style={{ display: 'grid', gap: 8, marginTop: 16 }}>
+          {used ? <Dialog open={depOpen} onOpenChange={setDepOpen}><DialogTrigger asChild><button className="btn btn-primary wide" disabled={!!busy}>{busy === 'Deposit' ? 'Depositing' : 'Deposit HYPE'}</button></DialogTrigger>
+              <DialogContent className="sign"><DialogHeader><DialogTitle>Lock more HYPE</DialogTitle><DialogDescription>Sent from your HyperCore spot balance to this contract. It cannot be withdrawn before {dt(Number(s.end))}.</DialogDescription></DialogHeader>
+                <label className="field dep-l">Amount, HYPE<input inputMode="decimal" value={depAmt} onChange={e => setDepAmt(e.target.value)} aria-invalid={!depOk} /></label>
+                {!depOk && <p className="err">Enter an amount above 0, at most 8 decimals.</p>}
+                <DialogFooter><DialogClose asChild><button className="btn btn-ghost">Go back</button></DialogClose><button className="btn btn-primary" onClick={deposit} disabled={!depOk}>Lock {depAmt} HYPE</button></DialogFooter></DialogContent></Dialog>
+            : <button className="btn btn-primary wide" onClick={sellSlice} disabled={!!busy}>{busy === 'Sale' ? 'Submitting sale' : "Trigger today's sale"}</button>}
+          <p className="muted">{used ? (s.balance === 0n ? 'Nothing left to sell. Selling needs a new deposit.' : "Today's allowance is used. Selling resumes at the next reset.") : 'Anyone may trigger it. The caller picks only the size.'}</p>
+          <button className="btn btn-ghost" onClick={reconcile} disabled={!!busy}>{busy === 'Reconcile' ? 'Reconciling' : 'Reconcile fills'}</button>
         </div>
-        <nav className="toc" aria-label="Clauses"><p className="meta">On this agreement</p><ol>{['Tokens locked', 'Maximum sale per day', 'Sale price', 'Cannot cancel', 'Term', 'Record of sales'].map((t, i) => <li key={t}><a href={`#c${i + 1}`} onClick={e => { e.preventDefault(); document.getElementById(`c${i + 1}`)?.scrollIntoView(); }}>{i + 1}. {t}</a></li>)}{[['judges', 'Annex B. For judges'], ['business', 'Annex C. Business model']].map(([id, t]) => <li key={id}><a href={`#${id}`} onClick={e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView(); }}>{t}</a></li>)}</ol></nav>
+        {log.length > 0 && <ul className="log" aria-live="polite">{log.map((l, i) => <li key={i}>{l}</li>)}</ul>}
+        <nav className="secnav" aria-label="Sections"><p className="muted">Jump to</p><div>{[['c1', 'Schedule'], ['c6', 'Sales'], ['c3', 'Price'], ['c4', 'Break it']].map(([id, t]) => <button key={id} className="navpill" onClick={() => go(id)}>{t}</button>)}</div></nav>
       </aside>
     </div>
-    <Annexes addr={addr} />
   </main>;
 }
 
 const E2E = { pledge: '0x9af101c5d73432510e037dc8b05ec35811de91a5', create: '0x1327f21141d54cbb8667c1c7ede7a28b494f48c602eee9e36bdb254a45fa3d57', sale: '0x5f9fb781be281ef3fe5acfb59c05ca45803314ba46ece30e117bb2f7fe051913', reconcile: '0x48b4ea63b122be32ab223c9f05b40936649ca0877f93b2e7a9549cbb59c65bd7' };
-function Annexes({ addr }: { addr: Address }) {
+function Judges({ addr }: { addr: Address }) {
   const [copied, setCopied] = useState<'' | 'ok' | 'fail'>('');
   const curl = `curl -s -X POST https://api.hyperliquid-testnet.xyz/info -H 'content-type: application/json' -d '{"type":"userFills","user":"${addr}"}'`;
-  return <section className="annexes">
-    <article className="annex-doc" id="judges">
-      <p className="fig1-n">Annex B</p><h2>For judges: how to verify it on-chain</h2>
+  const RV: [string, string, string][] = [
+    ['ok', 'Real, testnet', 'Create, deposit, IOC sale filled on HyperCore, filled-size daily cap, unfilled order refund'],
+    ['ok', 'Real, testnet', 'Cancel and early withdraw revert; sale blocked under the floor and before the start; team release after the end; anyone can trigger a sale'],
+    ['warn', 'Fork-simulated', 'Daily allowance resetting across several days, price crash mid-term'],
+    ['neutral', 'Planned', '0.25% fee, mainnet, other tokens'],
+  ];
+  return <>
+    <section className="band" style={{ marginBottom: 24 }}><div style={{ display: 'grid', gap: 8 }}><p className="addr">Hyperliquid testnet evidence</p><h1>Verify PLEDGE on-chain</h1><p className="sub">Four checks against the live demo agreement, plus what is real and what is simulated.</p></div></section>
+    <section className="card" id="judges" aria-labelledby="h-j">
+      <div className="card-h"><h2 id="h-j">For judges: verify on-chain</h2><span className="chip ok">About 60 seconds</span></div>
       <ol className="steps">
-        <li><p><b>The contract exists and holds the terms.</b> Open <a href={`${EXPLORER}/address/${addr}`} target="_blank" rel="noreferrer" className="fig">{short(addr)}</a> on the HyperEVM testnet explorer. The source is in the project repo at <span className="fig">contracts/src/Pledge.sol</span>, and the explorer's <a href={`${EXPLORER}/address/${addr}`} target="_blank" rel="noreferrer">contract page</a> shows the deployed bytecode; it has no owner, no admin and no withdraw before the end date.</p></li>
-        <li><p><b>It cannot be cancelled.</b> Press the three "Simulate" buttons in <a href="#c4" onClick={e => { e.preventDefault(); document.getElementById('c4')?.scrollIntoView(); }}>clause 4</a>. Each one asks the live contract. While the term runs, each comes back "Rejected by the contract". After the end date the team's withdrawal is allowed, as the terms say. "Could not check (network)" means the RPC failed, not the contract. {addr.toLowerCase() === DEMO.toLowerCase() ? ' On this demo agreement the same calls were also sent as real transactions and reverted; the links are next to each check.' : ''}</p></li>
-        <li><p><b>Check this agreement's fills on HyperCore.</b> They are also listed in <a href="#c6" onClick={e => { e.preventDefault(); document.getElementById('c6')?.scrollIntoView(); }}>clause 6</a>, read from the same API. Run this and look for side "A" (sell) fills. An agreement that has not sold yet returns an empty list.</p><pre className="code fig">{curl}</pre><button className="btn-outline" onClick={() => (navigator.clipboard ? navigator.clipboard.writeText(curl) : Promise.reject()).then(() => setCopied('ok'), () => setCopied('fail'))}>{copied === 'ok' ? 'Copied' : 'Copy command'}</button>{copied === 'fail' && <p className="bad">The browser blocked copying. Select the command above and copy it by hand.</p>}</li>
-        <li><p><b>The full flow works from a wallet.</b> On a separate test agreement, our click-through test drafted a new agreement, deposited 0.5 HYPE, triggered a sale and reconciled it, from a browser wallet on testnet: agreement <a href={`${EXPLORER}/address/${E2E.pledge}`} target="_blank" rel="noreferrer" className="fig">{short(E2E.pledge)}</a>, create <a href={`${EXPLORER}/tx/${E2E.create}`} target="_blank" rel="noreferrer" className="fig">{short(E2E.create)}</a>, sale <a href={`${EXPLORER}/tx/${E2E.sale}`} target="_blank" rel="noreferrer" className="fig">{short(E2E.sale)}</a>, reconcile <a href={`${EXPLORER}/tx/${E2E.reconcile}`} target="_blank" rel="noreferrer" className="fig">{short(E2E.reconcile)}</a>. The fill was 0.5 HYPE at 22.538 against bids already on the testnet book.</p></li>
+        <li><p><b>The contract holds the terms.</b> Open <Addr a={addr} /> on the testnet explorer. No owner, no admin, no early withdraw. Source: contracts/src/Pledge.sol in the repo.</p></li>
+        <li><p><b>It cannot be cancelled.</b> Press the three buttons in "Try to break it" on the <a className="link" href="#/">agreement page</a>. While the term runs, each one is rejected by the contract.</p></li>
+        <li><div><p><b>Check the fills yourself.</b> Look for side "A" (sell). A new agreement returns an empty list.</p><pre className="code">{curl}</pre>
+          <button className="btn btn-secondary" onClick={() => (navigator.clipboard ? navigator.clipboard.writeText(curl) : Promise.reject()).then(() => setCopied('ok'), () => setCopied('fail'))}>{copied === 'ok' ? 'Copied' : 'Copy command'}</button>{copied === 'fail' && <p className="err">The browser blocked copying. Select the command and copy it by hand.</p>}</div></li>
+        <li><p><b>The full wallet flow ran on testnet.</b> Separate test agreement <Addr a={E2E.pledge} />: create <Addr a={E2E.create} kind="tx" />, sale <Addr a={E2E.sale} kind="tx" /> (0.5 HYPE @ 22.538), reconcile <Addr a={E2E.reconcile} kind="tx" />.</p></li>
       </ol>
-      <h3 className="rail-h3">What is real and what is simulated</h3><ul className="rvl"><li><span className="rv-b"><Badge variant="outline">real, testnet</Badge></span><span>Contract deployed, terms fixed, cancel and early withdraw revert</span></li><li><span className="rv-b"><Badge variant="outline">real, testnet</Badge></span><span>Deposit of HYPE from HyperCore into the contract</span></li><li><span className="rv-b"><Badge variant="outline">real, testnet</Badge></span><span>Sale as an IOC order on the HyperCore HYPE/USDC book, filled size counted against the daily cap</span></li><li><span className="rv-b"><Badge variant="outline">real, testnet</Badge> (an earlier IOC was cancelled and refunded)</span><span>Unfilled orders return their size to the day's allowance</span></li><li><span className="rv-b"><Badge variant="outline">real, testnet</Badge></span><span>Sale blocked under the floor, sale blocked before the start date, team withdraws the remainder after the end date, anyone (not just the team) can trigger a sale. Txs in the repo: deployments/feature-tests.json and keeper-test.json</span></li><li><span className="rv-b"><Badge variant="outline">fork-simulated</Badge> see Annex A</span><span>The daily allowance resetting across several days, and a price crash below the floor mid-term</span></li><li><span className="rv-b"><Badge variant="outline">planned</Badge></span><span>The 0.25% fee, mainnet, other tokens</span></li></ul>
-    </article>
-    <article className="annex-doc" id="business">
-      <p className="fig1-n">Annex C</p><h2>Business model</h2>
-      <p><b>Who pays:</b> the token team or foundation that locks supply. They get a public, checkable promise about how the locked supply will be sold, which they can show to exchanges, market makers and holders. Buyers and keepers pay no PLEDGE fee, only normal network gas.</p>
-      <p><b>Fee (proposed, not in the testnet contract):</b> 0.25% of filled sale proceeds, taken in USDC as each sale fills. A team only pays when the plan is working. For comparison, Streamflow charges 0.16 SOL per contract plus 0.19% of the tokens vested, or 0.16 SOL plus 0.5% for a token lock, both on the allocated amount; Sablier's interface charges $0.99 per stream withdrawal. PLEDGE's proposed fee is on filled sale proceeds instead.</p>
-      <p><b>Market:</b> Tokenomist counts <span className="fig">$97.43B</span> of tokens unlocked in 2025, of which <span className="fig">$18.77B</span> went to insiders (team and investors), the supply holders worry about most. HYPE itself unlocked about <span className="fig">$496M</span> in 2025. Illustration only: if 1% of insider unlocks were sold through PLEDGE at 0.25%, that is about <span className="fig">$470K</span> a year in fees. This is the global unlock market, not evidence of demand on Hyperliquid or of willingness to pay.</p>
-      <p className="meta">Sources: <a href="https://www.tokenomist.ai/research/2025-token-unlocks-review-a-complete-breakdown-of-emissions-insider-vesting-and-market-impact" target="_blank" rel="noreferrer">Tokenomist 2025 Token Unlocks Review</a>; <a href="https://streamflow.finance/blog/how-much-does-streamflow-cost" target="_blank" rel="noreferrer">Streamflow pricing</a>; <a href="https://docs.sablier.com/concepts/fees" target="_blank" rel="noreferrer">Sablier fees</a>.</p>
-    </article>
-  </section>;
+      <div className="rv">{RV.map(([c, l, t]) => <div key={t}><span className={'chip ' + c}>{l}</span><span>{t}</span></div>)}</div>
+    </section>
+  </>;
+}
+
+function Business() {
+  return <>
+    <section className="band" style={{ marginBottom: 24 }}><div style={{ display: 'grid', gap: 8 }}><p className="addr">Who pays and how big</p><h1>Business model</h1><p className="sub">The token team pays a planned fee on filled sales. Market figures are sourced.</p></div></section>
+    <section className="card" id="business" aria-labelledby="h-b">
+      <div className="card-h"><h2 id="h-b">Business model</h2><span className="chip neutral">Fee planned</span></div>
+      <div className="stat3"><div><b>$97.43B</b><span>Tokens unlocked in 2025</span></div><div><b>$18.77B</b><span>Of that to insiders</span></div><div><b>0.25%</b><span>Planned fee on filled proceeds</span></div></div>
+      <p><b>The token team pays</b>, only when a sale fills. Buyers and keepers pay no PLEDGE fee, only gas. For comparison, Streamflow charges 0.16 SOL plus 0.19% of tokens vested (0.5% for a lock); Sablier charges $0.99 per withdrawal. Illustration only: 1% of insider unlocks at 0.25% is about $470K a year; this is the global market, not proof of demand on Hyperliquid. The fee is not in the testnet contract.</p>
+      <p className="muted" style={{ marginTop: 12 }}>Sources: <a className="link" href="https://www.tokenomist.ai/research/2025-token-unlocks-review-a-complete-breakdown-of-emissions-insider-vesting-and-market-impact" target="_blank" rel="noreferrer">Tokenomist</a> · <a className="link" href="https://streamflow.finance/blog/how-much-does-streamflow-cost" target="_blank" rel="noreferrer">Streamflow</a> · <a className="link" href="https://docs.sablier.com/concepts/fees" target="_blank" rel="noreferrer">Sablier</a></p>
+    </section>
+  </>;
 }
 
 function Create() {
   const [f, setF] = useState({ cap: '0.5', floor: '5', start: '', days: '30', band: '2' }); const [out, setOut] = useState(''); const [busy, setBusy] = useState(false); const [open, setOpen] = useState(false);
-    const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value }); const capOk = /^\d+(\.\d{1,2})?$/.test(f.cap) && Number(f.cap) > 0 && Number(f.cap) <= 1e6, floorOk = /^\d+(\.\d{1,8})?$/.test(f.floor) && Number(f.floor) > 0 && Number(f.floor) <= 1e9, bandOk = /^\d+(\.\d{1,2})?$/.test(f.band) && Number(f.band) > 0 && Number(f.band) < 100, daysOk = /^\d+$/.test(f.days) && Number(f.days) >= 1 && Number(f.days) <= 3650, valid = capOk && floorOk && bandOk && daysOk; const ts = (d: Date) => d.toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }); const startD = f.start ? new Date(f.start) : new Date(); const endD = new Date(startD.getTime() + Number(f.days || 0) * 86400000);
-  const go = async () => { setOpen(false); setBusy(true); setOut('');
-    try { const w = await wallet(); const start = f.start ? BigInt(Math.floor(new Date(f.start).getTime() / 1000)) : 0n;
-      const cap = BigInt(Math.round(Number(f.cap) * 100)) * 1000000n;
+  const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value }); const capOk = /^\d+(\.\d{1,2})?$/.test(f.cap) && Number(f.cap) > 0 && Number(f.cap) <= 1e6, floorOk = /^\d+(\.\d{1,8})?$/.test(f.floor) && Number(f.floor) > 0 && Number(f.floor) <= 1e9, bandOk = /^\d+(\.\d{1,2})?$/.test(f.band) && Number(f.band) > 0 && Number(f.band) < 100, daysOk = /^\d+$/.test(f.days) && Number(f.days) >= 1 && Number(f.days) <= 3650, valid = capOk && floorOk && bandOk && daysOk;
+  const ts = (d: Date) => d.toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }); const startD = f.start ? new Date(f.start) : new Date(); const endD = new Date(startD.getTime() + Number(f.days || 0) * 86400000);
+  const deploy = async () => { setOpen(false); setBusy(true); setOut('');
+    try { const w = await wallet(); const start = f.start ? BigInt(Math.floor(new Date(f.start).getTime() / 1000)) : 0n; const cap = BigInt(Math.round(Number(f.cap) * 100)) * 1000000n;
       const h = await w.deployContract({ abi: ABI, bytecode: BYTECODE, args: [11035, 1035, 1105n, cap, BigInt(Math.round(Number(f.floor) * 1e8)), BigInt(Math.round(Number(f.band) * 100)), 100n, start, BigInt(f.days)], chain: w.chain, account: w.account! });
       const r = await pub.waitForTransactionReceipt({ hash: h }); location.hash = '#/p/' + r.contractAddress; }
     catch (e) { setOut(revertReason(e)); } setBusy(false); };
-  return <main className="cols create"><article className="doc">
-    <p className="ref">Draft agreement for HYPE on the HyperCore HYPE/USDC spot book</p>
-    <h1>Draft a lock agreement</h1>
-    <p className="lede">Once signed, these terms are fixed in the contract. Nobody can loosen them, the team included.</p>
-    <ol className="clauses form">
-      <li><h2>Maximum sale per day</h2><label>HYPE of filled size per 24 hours<input inputMode="decimal" value={f.cap} onChange={set('cap')} aria-invalid={!capOk} /></label>{!capOk && <p className="bad">Use a number above 0 with at most 2 decimals.</p>}</li>
-      <li><h2>Start</h2><label>Selling begins (leave blank to start now)<input type="datetime-local" value={f.start} onChange={set('start')} /></label></li>
-      <li><h2>Term</h2><label>Length in days<input inputMode="numeric" value={f.days} onChange={set('days')} aria-invalid={!daysOk} /></label>{!daysOk && <p className="bad">A whole number of days, 1 to 3650.</p>}</li>
-      <li><h2>Sale price</h2><label>Floor, USDC per HYPE<input inputMode="decimal" value={f.floor} onChange={set('floor')} aria-invalid={!floorOk} /></label>{!floorOk && <p className="bad">Above 0, at most 8 decimals.</p>}<label>Largest discount to the oracle, %<input inputMode="decimal" value={f.band} onChange={set('band')} aria-invalid={!bandOk} /></label>{!bandOk && <p className="bad">Above 0 and under 100, at most 2 decimals.</p>}</li>
-    </ol>
-    {out && <p className="bad">{out}</p>}
-  </article>
-  <aside className="rail" aria-label="Summary">
-    <h2 className="rail-h">You are agreeing to</h2>
-    <dl className="attrs"><div><dt>Max sale / day</dt><dd className="fig">{f.cap} HYPE</dd></div><div><dt>Floor</dt><dd className="fig">${f.floor}</dd></div><div><dt>Max discount</dt><dd className="fig">{f.band}%</dd></div><div><dt>Selling starts</dt><dd className="fig">{ts(startD)}</dd></div><div><dt>Withdrawal opens</dt><dd className="fig">{ts(endD)}</dd></div><div><dt>Term</dt><dd className="fig">{f.days} days</dd></div><div className="full"><dt>Cancelable</dt><dd>No. There is no cancel or early withdraw path.</dd></div></dl>
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><button className="btn-primary wide" disabled={busy || !valid}>{busy ? 'Deploying' : 'Review and sign'}</button></DialogTrigger>
-      <DialogContent className="sign">
-        <DialogHeader><DialogTitle className="sign-t">Sign this agreement</DialogTitle><DialogDescription className="sign-d">These terms cannot be changed after deployment.</DialogDescription></DialogHeader>
-        <ol className="sign-l"><li>Sell at most <span className="fig">{f.cap} HYPE</span> per day.</li><li>Never below <span className="fig">${f.floor}</span>, and no more than <span className="fig">{f.band}%</span> under the oracle.</li><li>Selling starts <span className="fig">{ts(startD)}</span>. No cancellation, and no withdrawal until <span className="fig">{ts(endD)}</span>.</li></ol>
-        <DialogFooter><DialogClose asChild><button className="btn-text">Go back</button></DialogClose><button className="btn-primary" onClick={go}>Sign and deploy on testnet</button></DialogFooter>
-      </DialogContent>
-    </Dialog>
-    {!valid && <p className="bad">Fix the highlighted terms before signing.</p>}<p className="meta">Next: deposit HYPE from your HyperCore spot balance on the agreement page.</p>
-  </aside></main>;
+  return <main className="create">
+    <section className="band"><div style={{ display: 'grid', gap: 8 }}><p className="addr">New agreement · HYPE on the HyperCore HYPE/USDC book</p><h1>Pledge your unlock</h1><p className="sub">Set the terms once. After signing nobody can loosen them, you included.</p></div></section>
+    <div className="grid">
+      <section className="card" aria-labelledby="h-terms">
+        <div className="card-h"><h2 id="h-terms">Terms</h2><span className="chip neutral">Fixed at deploy</span></div>
+        <div className="form-grid">
+          <label className="field">HYPE of filled size per 24 hours<input inputMode="decimal" value={f.cap} onChange={set('cap')} aria-invalid={!capOk} />{!capOk ? <span className="err">Above 0, at most 2 decimals.</span> : <span className="hint">The daily cap counts filled size only.</span>}</label>
+          <label className="field">Length in days<input inputMode="numeric" value={f.days} onChange={set('days')} aria-invalid={!daysOk} />{!daysOk ? <span className="err">A whole number, 1 to 3650.</span> : <span className="hint">The team can withdraw any remainder after this.</span>}</label>
+          <label className="field">Floor, USDC per HYPE<input inputMode="decimal" value={f.floor} onChange={set('floor')} aria-invalid={!floorOk} />{!floorOk ? <span className="err">Above 0, at most 8 decimals.</span> : <span className="hint">Sales halt below this price.</span>}</label>
+          <label className="field">Largest discount to the oracle, %<input inputMode="decimal" value={f.band} onChange={set('band')} aria-invalid={!bandOk} />{!bandOk ? <span className="err">Above 0 and under 100.</span> : <span className="hint">Sets the order limit under the oracle.</span>}</label>
+          <label className="field" style={{ gridColumn: '1/-1' }}>Selling begins<input type="datetime-local" value={f.start} onChange={set('start')} /><span className="hint">Leave blank to start now.</span></label>
+        </div>
+        {out && <p className="err" role="alert">{out}</p>}
+      </section>
+      <aside className="panel card" aria-label="Summary">
+        <div className="card-h"><h2>You are agreeing to</h2><span className="chip neutral">Not cancelable</span></div>
+        <dl className="kv"><div><dt>Max sale / day</dt><dd>{f.cap} HYPE</dd></div><div><dt>Floor</dt><dd>${f.floor}</dd></div><div><dt>Max discount</dt><dd>{f.band}%</dd></div><div><dt>Term</dt><dd>{f.days} days</dd></div><div style={{ gridColumn: '1/-1' }}><dt>Selling starts</dt><dd>{ts(startD)}</dd></div><div style={{ gridColumn: '1/-1' }}><dt>Withdrawal opens</dt><dd>{ts(endD)}</dd></div></dl>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild><button className="btn btn-primary wide" disabled={busy || !valid}>{busy ? 'Deploying' : 'Review and sign'}</button></DialogTrigger>
+          <DialogContent className="sign"><DialogHeader><DialogTitle>Sign this agreement</DialogTitle><DialogDescription>These terms cannot be changed after deployment.</DialogDescription></DialogHeader>
+            <ol className="sign-l"><li>Sell at most <b className="mono">{f.cap} HYPE</b> per day.</li><li>Never below <b className="mono">${f.floor}</b>, at most <b className="mono">{f.band}%</b> under the oracle.</li><li>Starts <b className="mono">{ts(startD)}</b>. No cancel, no withdrawal until <b className="mono">{ts(endD)}</b>.</li></ol>
+            <DialogFooter><DialogClose asChild><button className="btn btn-ghost">Go back</button></DialogClose><button className="btn btn-primary" onClick={deploy}>Sign and deploy on testnet</button></DialogFooter></DialogContent></Dialog>
+        {!valid && <p className="err">Fix the highlighted terms before signing.</p>}
+        <p className="muted" style={{ marginTop: 12 }}>Next: deposit HYPE from your HyperCore spot balance on the agreement page.</p>
+      </aside>
+    </div>
+  </main>;
 }
