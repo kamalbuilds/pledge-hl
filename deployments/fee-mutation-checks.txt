@@ -1,0 +1,15 @@
+# PLEDGE fee mutation checks (forge 1.6.0-nightly, optimizer on). Each row: guard broken -> unit suite [passed, failed] and the tests that went red; source restored after every row.
+BASELINE (unmutated): Ran 2 test suites in 84.23ms (96.67ms CPU time): 28 tests passed, 0 failed, 0 skipped (28 total tests)
+M1 fee bps off by one -> [('22', '6')] ['testFuzz_teamProceedsPlusFeeEqualGross', 'test_eachSaleChargedOnItsOwnProceeds', 'test_feeIs25bpsOfFilledProceeds', 'test_noFeeOnRefundedRemainder', 'test_releaseSettlesFeeBeforeTeamMovesProceeds', 'test_teamProceedsPlusFeeEqualGross'] 
+M1b fee rounds up -> [('25', '3')] ['testFuzz_teamProceedsPlusFeeEqualGross', 'test_feeIs25bpsOfFilledProceeds', 'test_teamProceedsPlusFeeEqualGross'] 
+M2 fee on unfilled sale -> [('27', '1')] ['test_noFeeOnUnfilledSale'] 
+M3 fee on whole held USDC -> [('21', '7')] ['testFuzz_teamProceedsPlusFeeEqualGross', 'test_eachSaleChargedOnItsOwnProceeds', 'test_feeIs25bpsOfFilledProceeds', 'test_feeNeverTakenFromHeldBalance', 'test_noFeeOnRefundedRemainder', 'test_releaseSettlesFeeBeforeTeamMovesProceeds', 'test_teamProceedsPlusFeeEqualGross'] 
+M3b baseline not refreshed per sale -> [('21', '7')] ['testFuzz_teamProceedsPlusFeeEqualGross', 'test_eachSaleChargedOnItsOwnProceeds', 'test_feeIs25bpsOfFilledProceeds', 'test_feeNeverTakenFromHeldBalance', 'test_noFeeOnRefundedRemainder', 'test_releaseSettlesFeeBeforeTeamMovesProceeds', 'test_teamProceedsPlusFeeEqualGross'] 
+M4 recipient mutable -> [('27', '1')] ['test_feeRecipientCannotBeChanged'] 
+M5a cap removed in Pledge -> [('27', '1')] ['test_feeBpsCannotExceedCap'] 
+M5b cap removed in factory -> [('27', '1')] ['test_feeBpsCannotExceedCap'] 
+M6 event net wrong -> [('27', '1')] ['test_feeIs25bpsOfFilledProceeds'] 
+M7 release skips reconcile -> [('27', '1')] ['test_releaseSettlesFeeBeforeTeamMovesProceeds'] 
+M8 release allows pending -> [('27', '1')] ['test_releaseBlockedWhileSaleUnsettled'] 
+M9 factory lets caller pick recipient (team=recipient) -> [('27', '1')] ['test_factoryFixesRecipientAndBpsForEveryAgreement'] 
+RESTORED: Ran 2 test suites in 41.97ms (42.53ms CPU time): 28 tests passed, 0 failed, 0 skipped (28 total tests)

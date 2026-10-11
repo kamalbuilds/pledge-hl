@@ -1,13 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 import "../src/Pledge.sol";
-interface Vm { function etch(address, bytes calldata) external; function warp(uint256) external; function roll(uint256) external; function prank(address) external; }
-contract MockCW { uint256 public n; bytes public last; function sendRawAction(bytes calldata d) external { n++; last = d; } }
+interface Vm { function etch(address, bytes calldata) external; function warp(uint256) external; function roll(uint256) external; function prank(address) external; function expectEmit(bool,bool,bool,bool) external; }
+// records every action; a spotSend (action 6) debits the mocked Core balance of the sender and credits the destination, like Core does
+contract MockCW { uint256 public n; bytes public last; mapping(address => mapping(uint64 => uint64)) public credited;
+    function sendRawAction(bytes calldata d) external {
+        n++; last = d;
+        if (uint8(d[3]) == 6) { (address to, uint64 tok, uint64 w) = abi.decode(d[4:], (address, uint64, uint64)); MockBal(address(0x801)).sub(tok, w); credited[to][tok] += w; }
+    } }
 contract MockPx { uint64 public v; function set(uint64 x) external { v = x; } fallback(bytes calldata) external returns (bytes memory) { return abi.encode(v); } }
-contract MockBal { uint64 public v; function set(uint64 x) external { v = x; } fallback(bytes calldata) external returns (bytes memory) { return abi.encode(v, uint64(0), uint64(0)); } }
+// per-token Core spot balance (precompile 0x801 takes (address, token)); set(x) is the pledged token 1105, setTok(0, x) is USDC
+contract MockBal { mapping(uint64 => uint64) public bal; function set(uint64 x) external { bal[1105] = x; } function setTok(uint64 t, uint64 x) external { bal[t] = x; } function sub(uint64 t, uint64 x) external { bal[t] -= x; }
+    fallback(bytes calldata d) external returns (bytes memory) { (, uint64 t) = abi.decode(d, (address, uint64)); return abi.encode(bal[t], uint64(0), uint64(0)); } }
 contract PledgeTest {
     Vm constant vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
     address constant CW = 0x3333333333333333333333333333333333333333; address constant BAL = address(0x801); address constant PX = address(0x808);
+    address constant FEE_TO = address(0xFEE);
     Pledge p;
     function setUp() public {
         vm.etch(CW, address(new MockCW()).code); vm.etch(PX, address(new MockPx()).code); vm.etch(BAL, address(new MockBal()).code);
@@ -15,7 +23,7 @@ contract PledgeTest {
         MockPx(PX).set(25_000_000); // 25.000000 (6 dec) -> px8 25e8
         MockBal(BAL).set(10e8);
         // cap 1.0 HYPE/day, floor 20, band 2%, pxMul 100, 30 days
-        p = new Pledge(11035, 1035, 1105, 1e8, 20e8, 200, 100, 0, 30);
+        p = new Pledge(address(this), FEE_TO, 25, Terms(11035, 1035, 1105, 1e8, 20e8, 200, 100, 0, 30));
     }
     function _ok(bytes memory d) internal returns (bool ok) { (ok,) = address(p).call(d); }
     function _next() internal { vm.roll(block.number + 1); }
@@ -48,7 +56,7 @@ contract PledgeTest {
     function test_nonTeamCannotRelease() public { vm.warp(block.timestamp + 31 days); vm.prank(address(0xBEEF)); require(!_ok(abi.encodeCall(p.release, (1105, 1)))); }
     function test_cancelAlwaysReverts() public { require(!_ok(abi.encodeCall(p.cancel, ()))); }
     function test_notStartedBlocks() public {
-        Pledge q = new Pledge(11035, 1035, 1105, 1e8, 20e8, 200, 100, uint64(block.timestamp + 1 days), 30);
+        Pledge q = new Pledge(address(this), FEE_TO, 25, Terms(11035, 1035, 1105, 1e8, 20e8, 200, 100, uint64(block.timestamp + 1 days), 30));
         (bool ok,) = address(q).call(abi.encodeCall(q.sell, (1e7))); require(!ok); vm.warp(block.timestamp + 1 days);
         (ok,) = address(q).call(abi.encodeCall(q.sell, (1e7))); require(ok, "started");
         require(q.endTs() == q.startTs() + 30 days);
