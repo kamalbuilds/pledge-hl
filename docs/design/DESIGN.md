@@ -3,7 +3,7 @@
 Written before code, Oct 11 2026. Replaces the v3 "term sheet" direction, which kamal rejected as a document dump.
 
 ## System pick
-`wise` from ~/.config/design-md/INDEX.md ("money on a schedule"): white cards on a soft green-gray canvas, a heavy near-black display sans, one vivid lime voltage for the primary action, pill buttons and chips, semantic green / amber / red. BACKED uses a custom dark "night ledger", so this is deliberately the opposite: light, rounded, consumer-fintech. Logged in hyperliquid/DESIGN-PICKS.md.
+`wise` from ~/.config/design-md/INDEX.md ("money on a schedule"): white cards on a soft green-gray canvas, a heavy near-black display sans, one vivid lime voltage for the primary action, pill buttons and chips, semantic green / amber / red. BACKED picked `linear.app` (near-black canvas, lavender accent), so this is deliberately the opposite: light, rounded, consumer-fintech. Logged in hyperliquid/DESIGN-PICKS.md.
 
 ## Contract (binding)
 1. Direction: a fintech dashboard for one lock agreement. A dark summary band with big metrics on top, then cards: a chart card, a sales table card, a rules card with live "try to break it" checks, and a sticky action panel with exactly one lime primary action.
