@@ -1,0 +1,12 @@
+ok   references: 3 captured
+ok   components logged
+FAIL score 7.8 min 6.5 (need >=8.0 and every axis >=7)
+ok   critic fresh:codex-exec-r18
+ok   r18-1440.png fresh
+ok   r18-390.png fresh
+ok   design-review grades A/B
+ok   uicraft gate
+ok   cwf banned grep
+ok   slop-check
+---- 1 failure(s)
+EXIT 1

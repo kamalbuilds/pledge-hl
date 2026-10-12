@@ -1,21 +1,21 @@
-# PLEDGE: 3 minute demo script
+# PLEDGE: demo script (shot by shot, at most 3:00)
 
-Live URL: https://pledge-ccs.pages.dev (Hyperliquid testnet, chain 998). Recording: docs/pitch/demo.mp4 and docs/pitch/demo.webm (1440x900).
+Record at 1440x900 against https://pledge-ccs.pages.dev on Hyperliquid testnet. Voice-over is first person as Kamal. Times are targets.
 
-## 0:00 to 0:30, the agreement
-Open the home page. It is the demo agreement, read live from the contract. Point at the heading: how much was deposited and how much is still locked. Point at Figure 1: the ceiling is the most the contract may have sold, the navy line is what really filled on HyperCore.
+| # | Time | Screen | Action | Voice-over |
+|---|------|--------|--------|------------|
+| 1 | 0:00 to 0:15 | Agreement page, top | Hold still. Cursor near the dark summary band. | "This is PLEDGE on Hyperliquid testnet. A team locked HYPE here, and only this contract can sell it." |
+| 2 | 0:15 to 0:35 | Summary band, four metric cards | Point at each card from left to right. | "Available to sell today, with its dollar value and share of the daily cap. The locked remainder. What has sold so far. The gross USDC from those sales." |
+| 3 | 0:35 to 0:50 | Status chips and the green "Hyperliquid testnet" badge | Hover the agreement address link. | "Status is a chip. Not cancelable. Every address opens in the testnet explorer." |
+| 4 | 0:50 to 1:10 | Sale schedule card | Click "Show the schedule chart" and hover a day. | "The green line is the most that could have sold by each day. The black line is what really filled. The tooltip shows the numbers." |
+| 5 | 1:10 to 1:25 | Sales on HyperCore table | Hover the sell row, then the hash link. | "This is a real fill on the HyperCore book. Anyone can check the hash." |
+| 6 | 1:25 to 1:40 | Price guard card | Point at oracle, order limit, floor. | "The contract sets the price: the oracle minus 2 percent, never below the floor. The caller only picks the size." |
+| 7 | 1:40 to 2:05 | Try to break it card | Click "Simulate cancellation", then "Simulate oversized sale". Wait for red "Rejected by the contract" chips. | "Can the team cancel? Rejected. Sell twice the daily cap? Rejected. These run live against the contract, and each one already reverted on-chain." |
+| 8 | 2:05 to 2:20 | Today panel (right) | Point at the progress bar and the green primary button. | "The panel shows today's allowance and the one next action. Anyone can trigger the day's sale." |
+| 9 | 2:20 to 2:45 | Click "Draft a new agreement" | Change the daily cap to 1. Click "Review and sign". Show the dialog, then click "Go back". | "Creating one takes four terms. Before signing you see the estimated outcome in plain words: dollars per day, the most that can sell, and a warning if the floor is above today's price." |
+| 10 | 2:45 to 3:00 | Click the "For judges" tab | Scroll slowly through the steps. | "The For judges page shows how to check all of this on-chain in about a minute, and labels what is real and what ran on a fork. PLEDGE: unlocks that cannot be dumped." |
 
-## 0:30 to 1:00, the terms
-Scroll the clauses. Clause 2 is the daily maximum. Clause 3 is the price rule: an order limit set from the oracle, never under the floor. Clause 6 is the record of sales, with the real fill.
-
-## 1:00 to 1:45, try to break it
-In clause 4, press "Simulate cancellation", "Simulate early withdrawal" and "Simulate oversized sale". Each asks the live contract and comes back "Rejected by the contract". Say: no one can cancel this, the team included.
-
-## 1:45 to 2:30, make a new one
-Click "Draft a new agreement". Show the five terms and the signing recap, then press "Review and sign" to show the confirmation. In the recording we stop here and do not sign. Say: our click-through test did the full flow from a browser wallet on testnet: create, deposit 0.5 HYPE, sale filled, reconcile. The links are in Annex B.
-
-## 2:30 to 3:00, for judges and business
-Scroll to Annex B: how to verify on-chain, and what is real versus simulated. Then Annex C: the team pays 0.25% of filled proceeds, with sourced market figures.
-
-## What is real and what is simulated
-Real on testnet: contract, deposit, sale fill on HyperCore, filled size cap, refund of unfilled orders, the three rejections. Also real: floor halt, not started block, end of term withdrawal, sale triggered by a non-team address. Fork simulated: the allowance resetting over several days (Annex A). Not built: mainnet, the fee.
+Notes
+- Do not sign a transaction on camera. The demo agreement is already fully sold, so the primary button reads "Deposit HYPE".
+- If the testnet RPC is slow, wait for the metric cards to load before starting shot 1.
+- Fork-simulated items (multi-day reset, price crash) are only mentioned on the For judges page. Do not present them as live.
