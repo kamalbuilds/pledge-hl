@@ -19,3 +19,7 @@ FINAL: 8.1 min=7 round=14 critic=fresh:codex-exec-r14 review=/Users/kamal/Deskto
 ## v4 (wise product UI), rounds 15-17
 r15 6.1 (min 4.5) -> r16 7.7 (min 6.5) -> r17 8.0 (min 7.0), Design B, AI Slop A. After r17: halted agreements disable the sale button, success chip contrast darkened, lime focus ring on the dark band.
 FINAL: 8.0 min=7 round=17 critic=fresh:codex-exec-r17 review=/Users/kamal/Desktop/solana/cwf/hyperliquid/projects/pledge/web/docs/design/design-audit-r17.md
+
+## Round 18 (web3 brief build b3b3823)
+r18: AVERAGE 7.8 MIN 6.5 (mobile), Design B, AI Slop A. Under the 8.0/7 bar; shipped anyway on the owner instruction, noted. Fixed after r18: R18-01 (lime zero no longer highlighted), R18-02 (timestamp is now the last successful read), R18-03 (halted label), R18-06 (renamed to Estimated outcome). Open: R18-04/05/07/08/09/10.
+FINAL: 7.8 min=6.5 round=18 critic=fresh:codex-exec-r18 review=/Users/kamal/Desktop/solana/cwf/hyperliquid/projects/pledge/web/docs/design/design-audit-r18.md
